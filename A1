@@ -446,3 +446,39 @@ const RequestVoucherScreen = () => {
 };
 
 export default RequestVoucherScreen;
+
+
+const fetchRoles = async () => {
+  setRoleLoading(true);
+
+  try {
+    const response = await callApi(
+      "UM/api/role/get-roles?permissions=true",
+      null,
+      "GET"
+    );
+
+    console.log("Roles API Response => ", response);
+
+    const rolesData =
+      response?.roles ||
+      response?.data?.roles ||
+      [];
+
+    const activeRoles = rolesData.filter(
+      (role) => role.roleStatus === "ACTIVE"
+    );
+
+    setRoles(activeRoles);
+  } catch (error) {
+    console.error("Failed to fetch roles", error);
+
+    setSnackbar({
+      open: true,
+      message: "Failed to load roles",
+      severity: "error",
+    });
+  } finally {
+    setRoleLoading(false);
+  }
+};
