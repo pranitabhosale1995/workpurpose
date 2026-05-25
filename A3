@@ -186,3 +186,126 @@
     </Grid>
   </CardContent>
 </Card>
+
+
+<Card
+  elevation={2}
+  sx={{
+    p: 4,
+    borderRadius: 3,
+    maxWidth: "1000px",
+    margin: "40px auto",
+  }}
+>
+  <Typography
+    variant="h6"
+    fontWeight={600}
+    mb={4}
+  >
+    Request Voucher
+  </Typography>
+
+  {/* TOP 3 FIELDS */}
+  <Grid container spacing={3}>
+    <Grid item xs={12} md={4}>
+      <FormControl fullWidth>
+        <InputLabel>
+          Voucher Category
+        </InputLabel>
+
+        <Select
+          name="voucherCategory"
+          value={formData.voucherCategory}
+          label="Voucher Category"
+          onChange={handleChange}
+        >
+          {voucherCategories.map((category) => (
+            <MenuItem
+              key={category}
+              value={category}
+            >
+              {category}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
+
+    <Grid item xs={12} md={4}>
+      <FormControl fullWidth>
+        <InputLabel>
+          Allowed Role
+        </InputLabel>
+
+        <Select
+          name="allowedRole"
+          value={formData.allowedRole}
+          label="Allowed Role"
+          onChange={handleChange}
+        >
+          {roles.map((role) => (
+            <MenuItem
+              key={role.roleId}
+              value={role.roleId}
+            >
+              {role.roleName}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
+
+    <Grid item xs={12} md={4}>
+      <TextField
+        fullWidth
+        label="SD Request Number"
+        name="sdRequestNumber"
+        value={formData.sdRequestNumber}
+        onChange={handleChange}
+        helperText="Only numbers and commas allowed"
+      />
+    </Grid>
+
+    {/* FULL WIDTH DESCRIPTION */}
+    <Grid item xs={12}>
+      <TextField
+        fullWidth
+        multiline
+        rows={5}
+        label="Description"
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+      />
+    </Grid>
+
+    {/* BUTTONS */}
+    <Grid item xs={12}>
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        gap={2}
+      >
+        <Button
+          variant="outlined"
+          sx={{
+            minWidth: "120px",
+            textTransform: "none",
+          }}
+        >
+          Reset
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{
+            minWidth: "120px",
+            textTransform: "none",
+          }}
+        >
+          Create
+        </Button>
+      </Box>
+    </Grid>
+  </Grid>
+</Card>
