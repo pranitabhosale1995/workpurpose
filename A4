@@ -118,3 +118,195 @@ const handleCreate = async () => {
     setLoading(false);
   }
 };
+
+
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+} from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
+
+
+const navigate = useNavigate();
+
+const [openDialog, setOpenDialog] =
+  useState(false);
+
+const [createdVID, setCreatedVID] =
+  useState("");
+
+
+
+const handleCreate = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1000)
+    );
+
+    // Add new category dynamically
+    if (
+      formData.voucherCategory === "Other" &&
+      formData.otherCategory.trim()
+    ) {
+      const newCategory =
+        formData.otherCategory.trim();
+
+      const alreadyExists =
+        voucherCategories.some(
+          (item) =>
+            item.toLowerCase() ===
+            newCategory.toLowerCase()
+        );
+
+      if (!alreadyExists) {
+        setVoucherCategories((prev) => [
+          ...prev.filter(
+            (item) => item !== "Other"
+          ),
+          newCategory,
+          "Other",
+        ]);
+      }
+    }
+
+    const generatedVID =
+      generateVID();
+
+    const payload = {
+      ...formData,
+
+      vid: generatedVID,
+
+      status: "ACTIVE",
+
+      createdDate:
+        new Date().toISOString(),
+    };
+
+    console.log(
+      "Create Payload =>",
+      payload
+    );
+
+    // popup open
+    setCreatedVID(generatedVID);
+
+    setOpenDialog(true);
+
+    // reset form
+    setFormData({
+      voucherCategory: "",
+      otherCategory: "",
+      description: "",
+      allowedRole: "",
+      sdRequestNumber: "",
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    setSnackbar({
+      open: true,
+      message: "Something went wrong",
+      severity: "error",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+<Dialog
+  open={openDialog}
+  onClose={() => setOpenDialog(false)}
+  maxWidth="xs"
+  fullWidth
+>
+  <DialogTitle>
+    Voucher Request Created
+  </DialogTitle>
+
+  <DialogContent>
+    <Typography mb={2}>
+      Voucher ID
+    </Typography>
+
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        border: "1px solid #ccc",
+        borderRadius: 2,
+        px: 2,
+        py: 1.5,
+        background: "#f8f9fa",
+      }}
+    >
+      <Typography
+        fontWeight={700}
+        color="primary"
+      >
+        {createdVID}
+      </Typography>
+
+      <IconButton
+        onClick={() => {
+          navigator.clipboard.writeText(
+            createdVID
+          );
+
+          setSnackbar({
+            open: true,
+            message:
+              "Voucher ID copied",
+            severity: "success",
+          });
+        }}
+      >
+        <ContentCopyIcon />
+      </IconButton>
+    </Box>
+  </DialogContent>
+
+  <DialogActions
+    sx={{
+      p: 3,
+      pt: 1,
+    }}
+  >
+    <Button
+      variant="outlined"
+      onClick={() => {
+        setOpenDialog(false);
+      }}
+    >
+      Create New Voucher
+    </Button>
+
+    <Button
+      variant="contained"
+      onClick={() => {
+        navigate(
+          "/view-voucher-request"
+        );
+      }}
+    >
+      View Requests
+    </Button>
+  </DialogActions>
+</Dialog>
