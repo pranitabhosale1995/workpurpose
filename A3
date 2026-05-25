@@ -520,3 +520,16 @@ if (name === "otherCategory") {
     return;
   }
 }
+
+
+<TextField
+  fullWidth
+  label="Other Category"
+  name="otherCategory"
+  value={formData.otherCategory}
+  onChange={handleChange}
+  inputProps={{
+    maxLength: 20,
+  }}
+  helperText={`${formData.otherCategory.length}/20`}
+/>
