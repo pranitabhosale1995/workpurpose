@@ -30,3 +30,91 @@ if (
     ]);
   }
 }
+
+
+const handleCreate = async () => {
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // Mock API Delay
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1000)
+    );
+
+    // Add new category dynamically
+    if (
+      formData.voucherCategory === "Other" &&
+      formData.otherCategory.trim()
+    ) {
+      const newCategory =
+        formData.otherCategory.trim();
+
+      const alreadyExists =
+        voucherCategories.some(
+          (item) =>
+            item.toLowerCase() ===
+            newCategory.toLowerCase()
+        );
+
+      if (!alreadyExists) {
+        setVoucherCategories((prev) => [
+          ...prev.filter(
+            (item) => item !== "Other"
+          ),
+          newCategory,
+          "Other",
+        ]);
+      }
+    }
+
+    // Payload
+    const payload = {
+      ...formData,
+
+      vid: generateVID(),
+
+      status: "ACTIVE",
+
+      createdDate:
+        new Date().toISOString(),
+    };
+
+    console.log(
+      "Create Payload =>",
+      payload
+    );
+
+    // Success Snackbar
+    setSnackbar({
+      open: true,
+      message:
+        "Voucher Request Created Successfully",
+      severity: "success",
+    });
+
+    // Reset Form
+    setFormData({
+      voucherCategory: "",
+      otherCategory: "",
+      description: "",
+      allowedRole: "",
+      sdRequestNumber: "",
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    setSnackbar({
+      open: true,
+      message: "Something went wrong",
+      severity: "error",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
