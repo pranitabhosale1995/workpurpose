@@ -310,3 +310,42 @@ const handleCreate = async () => {
     </Button>
   </DialogActions>
 </Dialog>
+
+
+
+
+const [currentScreen, setCurrentScreen] =
+  useState("request");
+
+import ViewVoucherRequestScreen
+from "./ViewVoucherRequestScreen";
+
+if (currentScreen === "view") {
+  return (
+    <ViewVoucherRequestScreen />
+  );
+}
+
+
+<Button
+  variant="contained"
+  onClick={() => {
+    setOpenDialog(false);
+
+    setCurrentScreen("view");
+  }}
+>
+  View Requests
+</Button>
+
+
+<Button
+  variant="outlined"
+  onClick={() => {
+    setOpenDialog(false);
+
+    setCurrentScreen("request");
+  }}
+>
+  Create New Voucher
+</Button>
