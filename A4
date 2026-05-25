@@ -1,0 +1,32 @@
+const [voucherCategories, setVoucherCategories] =
+  useState([
+    "Payment",
+    "Journal",
+    "Adjustment",
+    "Other",
+  ]);
+
+if (
+  formData.voucherCategory === "Other" &&
+  formData.otherCategory.trim()
+) {
+  const newCategory =
+    formData.otherCategory.trim();
+
+  const alreadyExists =
+    voucherCategories.some(
+      (item) =>
+        item.toLowerCase() ===
+        newCategory.toLowerCase()
+    );
+
+  if (!alreadyExists) {
+    setVoucherCategories((prev) => [
+      ...prev.filter(
+        (item) => item !== "Other"
+      ),
+      newCategory,
+      "Other",
+    ]);
+  }
+}
