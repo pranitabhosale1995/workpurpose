@@ -349,3 +349,121 @@ if (currentScreen === "view") {
 >
   Create New Voucher
 </Button>
+
+
+
+{/* TOP SECTION */}
+<Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns:
+      formData.voucherCategory ===
+      "Other"
+        ? "1fr 1fr"
+        : "1fr",
+    gap: 3,
+
+    "@media (max-width:900px)": {
+      gridTemplateColumns: "1fr",
+    },
+  }}
+>
+  {/* Voucher Category */}
+  <FormControl
+    fullWidth
+    error={!!errors.voucherCategory}
+  >
+    <InputLabel>
+      Voucher Category
+    </InputLabel>
+
+    <Select
+      name="voucherCategory"
+      value={formData.voucherCategory}
+      label="Voucher Category"
+      onChange={handleChange}
+    >
+      {voucherCategories.map(
+        (category) => (
+          <MenuItem
+            key={category}
+            value={category}
+          >
+            {category}
+          </MenuItem>
+        )
+      )}
+    </Select>
+  </FormControl>
+
+  {/* OTHER CATEGORY */}
+  {formData.voucherCategory ===
+    "Other" && (
+    <TextField
+      fullWidth
+      label="Other Category"
+      name="otherCategory"
+      value={formData.otherCategory}
+      onChange={handleChange}
+      error={!!errors.otherCategory}
+      inputProps={{
+        maxLength: 20,
+      }}
+      helperText={
+        errors.otherCategory
+          ? errors.otherCategory
+          : `${formData.otherCategory.length}/20`
+      }
+    />
+  )}
+</Box>
+
+
+<Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns:
+      "1fr 1fr",
+    gap: 3,
+
+    "@media (max-width:900px)": {
+      gridTemplateColumns: "1fr",
+    },
+  }}
+>
+  {/* Allowed Role */}
+  <FormControl
+    fullWidth
+    error={!!errors.allowedRole}
+  >
+    <InputLabel>
+      Allowed Role
+    </InputLabel>
+
+    <Select
+      name="allowedRole"
+      value={formData.allowedRole}
+      label="Allowed Role"
+      onChange={handleChange}
+    >
+      {roles.map((role) => (
+        <MenuItem
+          key={role.roleId}
+          value={role.roleId}
+        >
+          {role.roleName}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+
+  {/* SD Request */}
+  <TextField
+    fullWidth
+    label="SD Request Number"
+    name="sdRequestNumber"
+    value={formData.sdRequestNumber}
+    onChange={handleChange}
+    helperText="Only numbers and commas allowed"
+  />
+</Box>
