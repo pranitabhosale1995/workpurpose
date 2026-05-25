@@ -504,3 +504,19 @@ return (
     </Snackbar>
   </Box>
 );
+
+
+
+if (name === "otherCategory") {
+  // only alphabets, numbers, space, hyphen
+  const regex = /^[A-Za-z0-9 -]*$/;
+
+  if (!regex.test(value)) {
+    return;
+  }
+
+  // max 20 chars
+  if (value.length > 20) {
+    return;
+  }
+}
