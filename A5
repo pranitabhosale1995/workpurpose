@@ -37,3 +37,52 @@ const fetchVoucherCategories = async () => {
     setVoucherCategories([]);
   }
 };
+
+
+
+const fetchVoucherCategories = async () => {
+  try {
+    const response = await callApi(
+      "/api/journals/voucher-categories",
+      null,
+      "GET"
+    );
+
+    console.log(
+      "Voucher Categories Response =>",
+      response
+    );
+
+    // Response array
+    const categories =
+      response?.data || [];
+
+    // Extract categoryName
+    const formattedCategories =
+      categories.map(
+        (item) => item.categoryName
+      );
+
+    setVoucherCategories(
+      formattedCategories
+    );
+
+  } catch (error) {
+    console.error(
+      "Category API Error =>",
+      error
+    );
+
+    setVoucherCategories([]);
+  }
+};
+
+
+{voucherCategories.map((item) => (
+  <MenuItem
+    key={item}
+    value={item}
+  >
+    {item}
+  </MenuItem>
+))}
