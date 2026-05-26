@@ -410,3 +410,503 @@ const ViewVoucherRequestsScreen =
 
 export default
   ViewVoucherRequestsScreen;
+
+
+
+
+
+
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
+
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import { DataGrid } from "@mui/x-data-grid";
+
+import useApi from "../../hooks/useApi";
+
+const ViewVoucherRequestsScreen = () => {
+
+  const { callApi } = useApi();
+
+  const [rows, setRows] = useState([]);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [searchVID, setSearchVID] =
+    useState("");
+
+  const [searchDate, setSearchDate] =
+    useState("");
+
+  const [
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+  ] = useState(false);
+
+  const [selectedRow, setSelectedRow] =
+    useState(null);
+
+  const [deleteRemark, setDeleteRemark] =
+    useState("");
+
+  const [snackbar, setSnackbar] =
+    useState({
+      open: false,
+      message: "",
+      severity: "success",
+    });
+
+  useEffect(() => {
+    fetchVouchers();
+  }, []);
+
+  // FETCH VOUCHERS
+  const fetchVouchers = async () => {
+
+    setLoading(true);
+
+    try {
+
+      let url =
+        "/api/journals/fetch-voucher";
+
+      const queryParams = [];
+
+      // Default AVAILABLE
+      queryParams.push(
+        "status=AVAILABLE"
+      );
+
+      // Search By VID
+      if (searchVID) {
+        queryParams.push(
+          `vid=${searchVID}`
+        );
+      }
+
+      // Search By Date
+      if (searchDate) {
+        queryParams.push(
+          `createdDate=${searchDate}`
+        );
+      }
+
+      if (queryParams.length > 0) {
+        url +=
+          "?" +
+          queryParams.join("&");
+      }
+
+      const response =
+        await callApi(
+          url,
+          null,
+          "GET"
+        );
+
+      console.log(
+        "Voucher Response =>",
+        response
+      );
+
+      const data =
+        Array.isArray(response)
+          ? response
+          : response?.data || [];
+
+      setRows(data);
+
+    } catch (error) {
+
+      console.error(
+        "Fetch Voucher Error =>",
+        error
+      );
+
+      setSnackbar({
+        open: true,
+        message:
+          "Failed to fetch vouchers",
+        severity: "error",
+      });
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+  // SEARCH
+  const handleSearch = () => {
+    fetchVouchers();
+  };
+
+  // DELETE CLICK
+  const handleDeleteClick = (
+    row
+  ) => {
+
+    setSelectedRow(row);
+
+    setDeleteRemark("");
+
+    setDeleteDialogOpen(true);
+  };
+
+  // DELETE API
+  const handleDelete =
+    async () => {
+
+    try {
+
+      const payload = {
+        vid: selectedRow?.vid,
+        remark: deleteRemark,
+      };
+
+      console.log(
+        "Delete Payload =>",
+        payload
+      );
+
+      /*
+      await callApi(
+        "/api/journals/delete-voucher",
+        payload,
+        "POST"
+      );
+      */
+
+      setDeleteDialogOpen(false);
+
+      setSnackbar({
+        open: true,
+        message:
+          "Voucher deleted successfully",
+        severity: "success",
+      });
+
+      fetchVouchers();
+
+    } catch (error) {
+
+      console.error(error);
+
+      setSnackbar({
+        open: true,
+        message:
+          "Delete failed",
+        severity: "error",
+      });
+    }
+  };
+
+  // COLUMNS
+  const columns = useMemo(
+    () => [
+      {
+        field: "vid",
+        headerName: "VID",
+        flex: 1,
+        minWidth: 180,
+      },
+
+      {
+        field: "category",
+        headerName:
+          "Category",
+        flex: 1,
+        minWidth: 160,
+      },
+
+      {
+        field: "createdBy",
+        headerName:
+          "Created By",
+        flex: 1,
+        minWidth: 160,
+      },
+
+      {
+        field: "status",
+        headerName:
+          "Status",
+        flex: 1,
+        minWidth: 140,
+      },
+
+      {
+        field: "createdAt",
+        headerName:
+          "Created At",
+        flex: 1.5,
+        minWidth: 220,
+
+        renderCell:
+          (params) =>
+            new Date(
+              params.value
+            ).toLocaleString(),
+      },
+
+      {
+        field: "action",
+        headerName:
+          "Action",
+        flex: 1,
+        minWidth: 180,
+
+        sortable: false,
+
+        renderCell:
+          (params) => (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={
+                <DeleteIcon />
+              }
+              onClick={() =>
+                handleDeleteClick(
+                  params.row
+                )
+              }
+            >
+              Delete
+            </Button>
+          ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <Box sx={{ p: 3 }}>
+
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          borderRadius: 4,
+        }}
+      >
+
+        <Typography
+          variant="h5"
+          fontWeight={600}
+          mb={3}
+        >
+          View Voucher Requests
+        </Typography>
+
+        {/* SEARCH */}
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              "1fr 1fr auto",
+            gap: 2,
+            mb: 3,
+
+            "@media (max-width:900px)":
+              {
+                gridTemplateColumns:
+                  "1fr",
+              },
+          }}
+        >
+
+          {/* SEARCH VID */}
+
+          <TextField
+            size="small"
+            label="Search By VID"
+            value={searchVID}
+            onChange={(e) =>
+              setSearchVID(
+                e.target.value
+              )
+            }
+          />
+
+          {/* SEARCH DATE */}
+
+          <TextField
+            size="small"
+            type="date"
+            label="Search By Date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={searchDate}
+            onChange={(e) =>
+              setSearchDate(
+                e.target.value
+              )
+            }
+          />
+
+          {/* SEARCH BUTTON */}
+
+          <Button
+            variant="contained"
+            onClick={handleSearch}
+          >
+            Search
+          </Button>
+
+        </Box>
+
+        {/* TABLE */}
+
+        <Box
+          sx={{
+            height: 550,
+            width: "100%",
+          }}
+        >
+
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            disableRowSelectionOnClick
+            pageSizeOptions={[
+              5,
+              10,
+              20,
+            ]}
+            initialState={{
+              pagination: {
+                paginationModel:
+                  {
+                    pageSize: 10,
+                  },
+              },
+            }}
+          />
+
+        </Box>
+
+      </Paper>
+
+      {/* DELETE DIALOG */}
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() =>
+          setDeleteDialogOpen(false)
+        }
+        fullWidth
+        maxWidth="sm"
+      >
+
+        <DialogTitle>
+          Delete Voucher
+        </DialogTitle>
+
+        <DialogContent>
+
+          <Typography
+            sx={{ mb: 2 }}
+          >
+            Please enter
+            mandatory remark
+            before deleting
+            voucher request.
+          </Typography>
+
+          <TextField
+            fullWidth
+            required
+            multiline
+            rows={3}
+            label="Remark *"
+            value={deleteRemark}
+            onChange={(e) =>
+              setDeleteRemark(
+                e.target.value
+              )
+            }
+          />
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button
+            onClick={() =>
+              setDeleteDialogOpen(
+                false
+              )
+            }
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="error"
+            variant="contained"
+            disabled={
+              !deleteRemark.trim()
+            }
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
+      {/* SNACKBAR */}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() =>
+          setSnackbar({
+            ...snackbar,
+            open: false,
+          })
+        }
+      >
+
+        <Alert
+          severity={
+            snackbar.severity
+          }
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+
+      </Snackbar>
+
+    </Box>
+  );
+};
+
+export default
+ViewVoucherRequestsScreen;
