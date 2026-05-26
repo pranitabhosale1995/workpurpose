@@ -151,3 +151,46 @@ const fetchVoucherCategories = async () => {
     )}
   </Select>
 </FormControl>
+const fetchVoucherCategories = async () => {
+  try {
+    const response = await callApi(
+      "/JS/journals/voucher-categories",
+      null,
+      "GET"
+    );
+
+    console.log(
+      "Voucher Categories API Response =>",
+      response
+    );
+
+    // API direct array return kart asel
+    const categories = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    // categoryName extract kar
+    const formattedCategories = categories.map(
+      (item) => item.categoryName
+    );
+
+    console.log(
+      "Formatted Categories =>",
+      formattedCategories
+    );
+
+    setVoucherCategories(
+      formattedCategories
+    );
+
+  } catch (error) {
+    console.error(
+      "Category API Error =>",
+      error
+    );
+
+    setVoucherCategories([]);
+  }
+};
+
+
