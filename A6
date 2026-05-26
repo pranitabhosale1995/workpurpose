@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState  } from "react";
+import { useSelector } from "react-redux";
 import {
   Alert,
   Box,
@@ -28,6 +30,8 @@ import useApi from "../../hooks/useApi";
 import ViewVoucherRequestScreen from "./ViewVoucherRequestScreen";
 
 const RequestVoucherScreen = () => {
+   const {  user } = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
 
   const { callApi } = useApi();
@@ -279,13 +283,13 @@ const RequestVoucherScreen = () => {
           description:
             formData.description,
 
-          roleId:
+          allowedRole:
             formData.roleId,
 
           sdReqNo:
             formData.sdRequestNumber,
 
-          createdById: 1,
+          createdBy: user.userID,
 
           remarks:
             formData.description,
@@ -335,6 +339,7 @@ const RequestVoucherScreen = () => {
           description: "",
           roleId: "",
           sdRequestNumber: "",
+          createdBy:"",
         });
 
         setErrors({});
