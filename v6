@@ -1,0 +1,412 @@
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Box,
+  Paper,
+  Typography,
+  IconButton,
+  Tooltip,
+  Chip,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import {
+  DataGrid,
+} from "@mui/x-data-grid";
+
+import useApi from "../../hooks/useApi";
+
+const ViewVoucherRequestsScreen =
+  () => {
+
+    const { callApi } =
+      useApi();
+
+    const [loading,
+      setLoading] =
+      useState(false);
+
+    const [rows,
+      setRows] =
+      useState([]);
+
+    const [snackbar,
+      setSnackbar] =
+      useState({
+        open: false,
+        message: "",
+        severity: "success",
+      });
+
+    useEffect(() => {
+      fetchVoucherRequests();
+    }, []);
+
+    const fetchVoucherRequests =
+      async () => {
+
+        setLoading(true);
+
+        try {
+
+          const response =
+            await callApi(
+              "/api/journals/fetch-voucher",
+              null,
+              "GET"
+            );
+
+          console.log(
+            "Fetch Voucher Response =>",
+            response
+          );
+
+          // Direct Array Response
+          const data =
+            Array.isArray(response)
+              ? response
+              : response?.data ||
+                [];
+
+          const formattedRows =
+            data.map(
+              (item) => ({
+                id:
+                  item.id,
+
+                vid:
+                  item.vid,
+
+                category:
+                  item.category,
+
+                createdBy:
+                  item.createdBy,
+
+                status:
+                  item.status,
+
+                createdAt:
+                  item.createdAt,
+              })
+            );
+
+          setRows(
+            formattedRows
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Fetch Voucher Error =>",
+            error
+          );
+
+          setSnackbar({
+            open: true,
+            message:
+              "Failed To Fetch Voucher Requests",
+            severity:
+              "error",
+          });
+
+        } finally {
+
+          setLoading(false);
+
+        }
+      };
+
+    const handleDelete =
+      async (row) => {
+
+        try {
+
+          console.log(
+            "Delete Voucher =>",
+            row
+          );
+
+          /*
+          await callApi(
+            `/api/journals/delete-voucher/${row.id}`,
+            null,
+            "DELETE"
+          );
+          */
+
+          const updatedRows =
+            rows.filter(
+              (item) =>
+                item.id !==
+                row.id
+            );
+
+          setRows(
+            updatedRows
+          );
+
+          setSnackbar({
+            open: true,
+            message:
+              "Voucher Deleted Successfully",
+            severity:
+              "success",
+          });
+
+        } catch (error) {
+
+          console.error(
+            "Delete Error =>",
+            error
+          );
+
+          setSnackbar({
+            open: true,
+            message:
+              "Failed To Delete Voucher",
+            severity:
+              "error",
+          });
+        }
+      };
+
+    const columns = [
+
+      {
+        field: "vid",
+        headerName:
+          "VID",
+        flex: 1.3,
+        minWidth: 180,
+      },
+
+      {
+        field: "category",
+        headerName:
+          "Category",
+        flex: 1,
+        minWidth: 160,
+      },
+
+      {
+        field: "createdBy",
+        headerName:
+          "Created By",
+        flex: 1,
+        minWidth: 160,
+      },
+
+      {
+        field: "status",
+        headerName:
+          "Status",
+        flex: 1,
+        minWidth: 150,
+
+        renderCell:
+          (params) => (
+
+            <Chip
+              label={
+                params.value
+              }
+              color={
+                params.value ===
+                "AVAILABLE"
+                  ? "success"
+                  : "default"
+              }
+              size="small"
+            />
+          ),
+      },
+
+      {
+        field: "createdAt",
+        headerName:
+          "Created At",
+        flex: 1.5,
+        minWidth: 220,
+
+        renderCell:
+          (params) => {
+
+            return new Date(
+              params.value
+            ).toLocaleString();
+          },
+      },
+
+      {
+        field: "action",
+        headerName:
+          "Action",
+        flex: 0.7,
+        minWidth: 120,
+        sortable: false,
+
+        renderCell:
+          (params) => (
+
+            <Tooltip title="Delete">
+
+              <IconButton
+                color="error"
+                onClick={() =>
+                  handleDelete(
+                    params.row
+                  )
+                }
+              >
+                <DeleteIcon />
+              </IconButton>
+
+            </Tooltip>
+          ),
+      },
+    ];
+
+    return (
+
+      <Box
+        sx={{
+          p: 3,
+        }}
+      >
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius:
+              "24px",
+
+            background:
+              "rgba(255,255,255,0.7)",
+
+            backdropFilter:
+              "blur(12px)",
+
+            boxShadow:
+              "0px 4px 20px rgba(0,0,0,0.08)",
+          }}
+        >
+
+          <Typography
+            variant="h6"
+            fontWeight={700}
+            mb={3}
+            color="#4b3fa7"
+          >
+            View Voucher Requests
+          </Typography>
+
+          <Box
+            sx={{
+              height: 550,
+              width: "100%",
+            }}
+          >
+
+            <DataGrid
+              rows={rows}
+              columns={
+                columns
+              }
+              loading={
+                loading
+              }
+              pageSize={10}
+              rowsPerPageOptions={[
+                10,
+                20,
+                50,
+              ]}
+              disableRowSelectionOnClick
+              sx={{
+                border:
+                  "none",
+
+                borderRadius:
+                  "18px",
+
+                background:
+                  "#fff",
+
+                "& .MuiDataGrid-columnHeaders":
+                  {
+                    backgroundColor:
+                      "#f4f2ff",
+
+                    fontSize:
+                      "15px",
+
+                    fontWeight:
+                      700,
+
+                    color:
+                      "#4b3fa7",
+
+                    borderRadius:
+                      "12px",
+                  },
+
+                "& .MuiDataGrid-cell":
+                  {
+                    borderBottom:
+                      "1px solid #f1f1f1",
+                  },
+
+                "& .MuiDataGrid-row:hover":
+                  {
+                    backgroundColor:
+                      "#faf8ff",
+                  },
+              }}
+            />
+
+          </Box>
+
+        </Paper>
+
+        <Snackbar
+          open={
+            snackbar.open
+          }
+          autoHideDuration={
+            3000
+          }
+          onClose={() =>
+            setSnackbar({
+              ...snackbar,
+              open: false,
+            })
+          }
+        >
+
+          <Alert
+            severity={
+              snackbar.severity
+            }
+            variant="filled"
+          >
+            {
+              snackbar.message
+            }
+          </Alert>
+
+        </Snackbar>
+
+      </Box>
+    );
+  };
+
+export default
+  ViewVoucherRequestsScreen;
