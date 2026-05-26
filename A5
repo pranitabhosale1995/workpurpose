@@ -86,3 +86,29 @@ const fetchVoucherCategories = async () => {
     {item}
   </MenuItem>
 ))}
+
+
+
+<FormControl fullWidth>
+  <InputLabel>
+    Voucher Category
+  </InputLabel>
+
+  <Select
+    name="voucherCategory"
+    value={formData.voucherCategory}
+    onChange={handleChange}
+    label="Voucher Category"
+  >
+    {voucherCategories.map(
+      (item, index) => (
+        <MenuItem
+          key={index}
+          value={item}
+        >
+          {item}
+        </MenuItem>
+      )
+    )}
+  </Select>
+</FormControl>
