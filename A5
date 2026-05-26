@@ -194,3 +194,107 @@ const fetchVoucherCategories = async () => {
 };
 
 
+
+const handleCreate = async () => {
+
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+
+    const payload = {
+      category:
+        formData.voucherCategory,
+
+      customCategory:
+        formData.voucherCategory ===
+        "Other"
+          ? formData.otherCategory
+          : "",
+
+      description:
+        formData.description,
+
+      allowedRole:
+        formData.allowedRole,
+
+      sdReqNo:
+        formData.sdRequestNumber,
+
+      createdBy:
+        "pranita",
+
+      remarks:
+        formData.description,
+    };
+
+    console.log(
+      "Create Voucher Payload =>",
+      payload
+    );
+
+    // API CALL
+    const response = await callApi(
+      "/api/journals/create-voucher",
+      payload,
+      "POST"
+    );
+
+    console.log(
+      "Create Voucher Response =>",
+      response
+    );
+
+    // Created VID
+    const createdVid =
+      response?.vid ||
+      response?.data?.vid ||
+      "";
+
+    setCreatedVID(createdVid);
+
+    // Open Success Popup
+    setOpenDialog(true);
+
+    // Success Snackbar
+    setSnackbar({
+      open: true,
+      message:
+        "Voucher Request Created Successfully",
+      severity: "success",
+    });
+
+    // Reset Form
+    setFormData({
+      voucherCategory: "",
+      otherCategory: "",
+      description: "",
+      allowedRole: "",
+      sdRequestNumber: "",
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Create Voucher API Error =>",
+      error
+    );
+
+    setSnackbar({
+      open: true,
+      message:
+        "Failed To Create Voucher",
+      severity: "error",
+    });
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
+
