@@ -1,912 +1,715 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
 
+
+import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Paper,
-  Typography,
-  IconButton,
-  Tooltip,
-  Chip,
-  Snackbar,
-  Alert,
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    FormControl,
+    FormHelperText,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    Snackbar,
+    TextField,
+    Typography,
 } from "@mui/material";
 
-import DeleteIcon from "@mui/icons-material/Delete";
+import useApi from "../../hooks/useApi";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import {
-  DataGrid,
-} from "@mui/x-data-grid";
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+} from "@mui/material";
 
-import useApi from "../../hooks/useApi";
+import { useNavigate } from "react-router-dom";
+import ViewVoucherRequestScreen
+    from "./ViewVoucherRequestScreen";
 
-const ViewVoucherRequestsScreen =
-  () => {
+const RequestVoucherScreen = () => {
+    const navigate = useNavigate();
 
-    const { callApi } =
-      useApi();
+    const [openDialog, setOpenDialog] =
+        useState(false);
 
-    const [loading,
-      setLoading] =
-      useState(false);
+    const [createdVID, setCreatedVID] =
+        useState("");
 
-    const [rows,
-      setRows] =
-      useState([]);
 
-    const [snackbar,
-      setSnackbar] =
-      useState({
+    const [currentScreen, setCurrentScreen] =
+        useState("request");
+    const { callApi } = useApi();
+
+    const [voucherCategories, setVoucherCategories] =
+        useState([]);
+
+    const [formData, setFormData] = useState({
+        catagoryId: "",
+        otherCategory: "",
+        description: "",
+        RoleId: "",
+        sdRequestNumber: "",
+    });
+
+    const [roles, setRoles] = useState([]);
+
+    const [errors, setErrors] = useState({});
+
+    const [loading, setLoading] = useState(false);
+
+    const [roleLoading, setRoleLoading] = useState(false);
+
+    const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
         severity: "success",
-      });
+    });
 
     useEffect(() => {
-      fetchVoucherRequests();
+        fetchRoles();
+        fetchVoucherCategories();
     }, []);
 
-    const fetchVoucherRequests =
-      async () => {
 
-        setLoading(true);
-
-        try {
-
-          const response =
-            await callApi(
-              "/api/journals/fetch-voucher",
-              null,
-              "GET"
-            );
-
-          console.log(
-            "Fetch Voucher Response =>",
-            response
-          );
-
-          // Direct Array Response
-          const data =
-            Array.isArray(response)
-              ? response
-              : response?.data ||
-                [];
-
-          const formattedRows =
-            data.map(
-              (item) => ({
-                id:
-                  item.id,
-
-                vid:
-                  item.vid,
-
-                category:
-                  item.category,
-
-                createdBy:
-                  item.createdBy,
-
-                status:
-                  item.status,
-
-                createdAt:
-                  item.createdAt,
-              })
-            );
-
-          setRows(
-            formattedRows
-          );
-
-        } catch (error) {
-
-          console.error(
-            "Fetch Voucher Error =>",
-            error
-          );
-
-          setSnackbar({
-            open: true,
-            message:
-              "Failed To Fetch Voucher Requests",
-            severity:
-              "error",
-          });
-
-        } finally {
-
-          setLoading(false);
-
-        }
-      };
-
-    const handleDelete =
-      async (row) => {
-
-        try {
-
-          console.log(
-            "Delete Voucher =>",
-            row
-          );
-
-          /*
-          await callApi(
-            `/api/journals/delete-voucher/${row.id}`,
-            null,
-            "DELETE"
-          );
-          */
-
-          const updatedRows =
-            rows.filter(
-              (item) =>
-                item.id !==
-                row.id
-            );
-
-          setRows(
-            updatedRows
-          );
-
-          setSnackbar({
-            open: true,
-            message:
-              "Voucher Deleted Successfully",
-            severity:
-              "success",
-          });
-
-        } catch (error) {
-
-          console.error(
-            "Delete Error =>",
-            error
-          );
-
-          setSnackbar({
-            open: true,
-            message:
-              "Failed To Delete Voucher",
-            severity:
-              "error",
-          });
-        }
-      };
-
-    const columns = [
-
-      {
-        field: "vid",
-        headerName:
-          "VID",
-        flex: 1.3,
-        minWidth: 180,
-      },
-
-      {
-        field: "category",
-        headerName:
-          "Category",
-        flex: 1,
-        minWidth: 160,
-      },
-
-      {
-        field: "createdBy",
-        headerName:
-          "Created By",
-        flex: 1,
-        minWidth: 160,
-      },
-
-      {
-        field: "status",
-        headerName:
-          "Status",
-        flex: 1,
-        minWidth: 150,
-
-        renderCell:
-          (params) => (
-
-            <Chip
-              label={
-                params.value
-              }
-              color={
-                params.value ===
-                "AVAILABLE"
-                  ? "success"
-                  : "default"
-              }
-              size="small"
-            />
-          ),
-      },
-
-      {
-        field: "createdAt",
-        headerName:
-          "Created At",
-        flex: 1.5,
-        minWidth: 220,
-
-        renderCell:
-          (params) => {
-
-            return new Date(
-              params.value
-            ).toLocaleString();
-          },
-      },
-
-      {
-        field: "action",
-        headerName:
-          "Action",
-        flex: 0.7,
-        minWidth: 120,
-        sortable: false,
-
-        renderCell:
-          (params) => (
-
-            <Tooltip title="Delete">
-
-              <IconButton
-                color="error"
-                onClick={() =>
-                  handleDelete(
-                    params.row
-                  )
-                }
-              >
-                <DeleteIcon />
-              </IconButton>
-
-            </Tooltip>
-          ),
-      },
-    ];
-
-    return (
-
-      <Box
-        sx={{
-          p: 3,
-        }}
-      >
-
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            borderRadius:
-              "24px",
-
-            background:
-              "rgba(255,255,255,0.7)",
-
-            backdropFilter:
-              "blur(12px)",
-
-            boxShadow:
-              "0px 4px 20px rgba(0,0,0,0.08)",
-          }}
-        >
-
-          <Typography
-            variant="h6"
-            fontWeight={700}
-            mb={3}
-            color="#4b3fa7"
-          >
-            View Voucher Requests
-          </Typography>
-
-          <Box
-            sx={{
-              height: 550,
-              width: "100%",
-            }}
-          >
-
-            <DataGrid
-              rows={rows}
-              columns={
-                columns
-              }
-              loading={
-                loading
-              }
-              pageSize={10}
-              rowsPerPageOptions={[
-                10,
-                20,
-                50,
-              ]}
-              disableRowSelectionOnClick
-              sx={{
-                border:
-                  "none",
-
-                borderRadius:
-                  "18px",
-
-                background:
-                  "#fff",
-
-                "& .MuiDataGrid-columnHeaders":
-                  {
-                    backgroundColor:
-                      "#f4f2ff",
-
-                    fontSize:
-                      "15px",
-
-                    fontWeight:
-                      700,
-
-                    color:
-                      "#4b3fa7",
-
-                    borderRadius:
-                      "12px",
-                  },
-
-                "& .MuiDataGrid-cell":
-                  {
-                    borderBottom:
-                      "1px solid #f1f1f1",
-                  },
-
-                "& .MuiDataGrid-row:hover":
-                  {
-                    backgroundColor:
-                      "#faf8ff",
-                  },
-              }}
-            />
-
-          </Box>
-
-        </Paper>
-
-        <Snackbar
-          open={
-            snackbar.open
-          }
-          autoHideDuration={
-            3000
-          }
-          onClose={() =>
-            setSnackbar({
-              ...snackbar,
-              open: false,
-            })
-          }
-        >
-
-          <Alert
-            severity={
-              snackbar.severity
-            }
-            variant="filled"
-          >
-            {
-              snackbar.message
-            }
-          </Alert>
-
-        </Snackbar>
-
-      </Box>
+const fetchVoucherCategories = async () => {
+  try {
+    const response = await callApi(
+      "/JS/journals/voucher-categories",
+      null,
+      "GET"
     );
-  };
 
-export default
-  ViewVoucherRequestsScreen;
+    console.log(
+      "Voucher Categories API Response =>",
+      response
+    );
+
+    const categories = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+  
+    const formattedCategories = categories.map(
+      (item) => item.categoryName
+    );
+
+    console.log(
+      "Formatted Categories =>",
+      formattedCategories
+    );
+
+    setVoucherCategories(
+      formattedCategories
+    );
+
+  } catch (error) {
+    console.error(
+      "Category API Error =>",
+      error
+    );
+
+    setVoucherCategories([]);
+  }
+};
 
 
 
 
+    const fetchRoles = async () => {
+        setRoleLoading(true);
+
+        try {
+
+            const response = await callApi("/UM/role/get-roles?permissions=true",
+                null,
+                "GET"
+            );
+
+            console.log("API RESPONSE => ", response);
+
+            const rolesData =
+                response?.result?.roles || [];
+
+            const activeRoles = rolesData.filter(
+                (role) => role.roleStatus === "ACTIVE"
+            );
+
+            setRoles(activeRoles);
+        } catch (error) {
+            console.error("Failed to fetch roles", error);
+
+            setSnackbar({
+                open: true,
+                message: "Failed to load roles",
+                severity: "error",
+            });
+        } finally {
+            setRoleLoading(false);
+        }
+    };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name === "description" && value.length > 500) {
+            return;
+        }
+
+        if (name === "otherCategory") {
+           
+            const regex = /^[A-Za-z0-9 -]*$/;
+
+            if (!regex.test(value)) {
+                return;
+            }
+
+          
+            if (value.length > 20) {
+                return;
+            }
+        }
+
+        if (name === "sdRequestNumber") {
+            const regex = /^[0-9,]*$/;
+
+            if (!regex.test(value)) {
+                return;
+            }
+        }
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: "",
+        }));
+    };
+
+    const validateForm = () => {
+        let newErrors = {};
+
+        if (!formData.voucherCategory) {
+            newErrors.voucherCategory =
+                "Voucher Category is required";
+        }
+
+        if (
+            formData.voucherCategory === "Other" &&
+            !formData.otherCategory.trim()
+        ) {
+            newErrors.otherCategory =
+                "Please enter other category";
+        }
+        if (!formData.description.length > 500) {
+            newErrors.description = "Maximum 500 Characters Allowed";
+        }
+
+        if (!formData.description.trim()) {
+            newErrors.description = "Description is required";
+        }
+
+        if (!formData.allowedRole) {
+            newErrors.allowedRole = "Allowed Role is required";
+        }
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const generateVID = () => {
+        const today = new Date();
+
+        const year = today.getFullYear();
+
+        const month = String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
+        const random = Math.floor(
+            10000 + Math.random() * 90000
+        );
+
+        return `VID-${year}${month}-${random}`;
+    };
+
+ const handleCreate = async () => {
+
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+
+    const payload = {
+      category:
+        formData.voucherCategory,
+
+      customCategory:
+        formData.voucherCategory ===
+        "Other"
+          ? formData.otherCategory
+          : "",
+
+      description:
+        formData.description,
+
+      allowedRole:
+        formData.allowedRole,
+
+      sdReqNo:
+        formData.sdRequestNumber,
+
+      createdBy:
+        "pranita",
+
+      remarks:
+        formData.description,
+    };
+
+    console.log(
+      "Create Voucher Payload =>",
+      payload
+    );
 
 
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+    const response = await callApi(
+      "/JS/journals/create-voucher",
+      payload,
+      "POST"
+    );
 
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+    console.log(
+      "Create Voucher Response =>",
+      response
+    );
+await fetchVoucherCategories();
 
-import DeleteIcon from "@mui/icons-material/Delete";
+    const createdVid =
+      response?.vid ||
+      response?.data?.vid ||
+      "";
 
-import { DataGrid } from "@mui/x-data-grid";
+    setCreatedVID(createdVid);
 
-import useApi from "../../hooks/useApi";
+  
+    setOpenDialog(true);
 
-const ViewVoucherRequestsScreen = () => {
-
-  const { callApi } = useApi();
-
-  const [rows, setRows] = useState([]);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [searchVID, setSearchVID] =
-    useState("");
-
-  const [searchDate, setSearchDate] =
-    useState("");
-
-  const [
-    deleteDialogOpen,
-    setDeleteDialogOpen,
-  ] = useState(false);
-
-  const [selectedRow, setSelectedRow] =
-    useState(null);
-
-  const [deleteRemark, setDeleteRemark] =
-    useState("");
-
-  const [snackbar, setSnackbar] =
-    useState({
-      open: false,
-      message: "",
+    setSnackbar({
+      open: true,
+      message:
+        "Voucher Request Created Successfully",
       severity: "success",
     });
 
-  useEffect(() => {
-    fetchVouchers();
-  }, []);
+   
+    setFormData({
+      voucherCategory: "",
+      otherCategory: "",
+      description: "",
+      allowedRole: "",
+      sdRequestNumber: "",
+    });
 
-  // FETCH VOUCHERS
-  const fetchVouchers = async () => {
+  } catch (error) {
 
-    setLoading(true);
+    console.error(
+      "Create Voucher API Error =>",
+      error
+    );
 
-    try {
+    setSnackbar({
+      open: true,
+      message:
+        "Failed To Create Voucher",
+      severity: "error",
+    });
 
-      let url =
-        "/api/journals/fetch-voucher";
+  } finally {
 
-      const queryParams = [];
+    setLoading(false);
 
-      // Default AVAILABLE
-      queryParams.push(
-        "status=AVAILABLE"
-      );
+  }
+};
+ 
+   
+    const handleReset = () => {
+        setFormData({
+            voucherCategory: "",
+            otherCategory: "",
+            description: "",
+            allowedRole: "",
+            sdRequestNumber: "",
+        });
 
-      // Search By VID
-      if (searchVID) {
-        queryParams.push(
-          `vid=${searchVID}`
+        setErrors({});
+    };
+    if (currentScreen === "view") {
+        return (
+            <ViewVoucherRequestScreen />
         );
-      }
-
-      // Search By Date
-      if (searchDate) {
-        queryParams.push(
-          `createdDate=${searchDate}`
-        );
-      }
-
-      if (queryParams.length > 0) {
-        url +=
-          "?" +
-          queryParams.join("&");
-      }
-
-      const response =
-        await callApi(
-          url,
-          null,
-          "GET"
-        );
-
-      console.log(
-        "Voucher Response =>",
-        response
-      );
-
-      const data =
-        Array.isArray(response)
-          ? response
-          : response?.data || [];
-
-      setRows(data);
-
-    } catch (error) {
-
-      console.error(
-        "Fetch Voucher Error =>",
-        error
-      );
-
-      setSnackbar({
-        open: true,
-        message:
-          "Failed to fetch vouchers",
-        severity: "error",
-      });
-
-    } finally {
-
-      setLoading(false);
-
     }
-  };
+   return (
+  <Box p={4}>
+    <Card
+      elevation={3}
+      sx={{
+        maxWidth: "1100px",
+        margin: "40px auto",
+        padding: 4,
+        borderRadius: 3,
+      }}
+    >
+      <Typography
+        variant="h5"
+        fontWeight={700}
+        mb={4}
+        color="primary"
+      >
+        Request Voucher
+      </Typography>
 
-  // SEARCH
-  const handleSearch = () => {
-    fetchVouchers();
-  };
-
-  // DELETE CLICK
-  const handleDeleteClick = (
-    row
-  ) => {
-
-    setSelectedRow(row);
-
-    setDeleteRemark("");
-
-    setDeleteDialogOpen(true);
-  };
-
-  // DELETE API
-  const handleDelete =
-    async () => {
-
-    try {
-
-      const payload = {
-        vid: selectedRow?.vid,
-        remark: deleteRemark,
-      };
-
-      console.log(
-        "Delete Payload =>",
-        payload
-      );
-
-      /*
-      await callApi(
-        "/api/journals/delete-voucher",
-        payload,
-        "POST"
-      );
-      */
-
-      setDeleteDialogOpen(false);
-
-      setSnackbar({
-        open: true,
-        message:
-          "Voucher deleted successfully",
-        severity: "success",
-      });
-
-      fetchVouchers();
-
-    } catch (error) {
-
-      console.error(error);
-
-      setSnackbar({
-        open: true,
-        message:
-          "Delete failed",
-        severity: "error",
-      });
-    }
-  };
-
-  // COLUMNS
-  const columns = useMemo(
-    () => [
-      {
-        field: "vid",
-        headerName: "VID",
-        flex: 1,
-        minWidth: 180,
-      },
-
-      {
-        field: "category",
-        headerName:
-          "Category",
-        flex: 1,
-        minWidth: 160,
-      },
-
-      {
-        field: "createdBy",
-        headerName:
-          "Created By",
-        flex: 1,
-        minWidth: 160,
-      },
-
-      {
-        field: "status",
-        headerName:
-          "Status",
-        flex: 1,
-        minWidth: 140,
-      },
-
-      {
-        field: "createdAt",
-        headerName:
-          "Created At",
-        flex: 1.5,
-        minWidth: 220,
-
-        renderCell:
-          (params) =>
-            new Date(
-              params.value
-            ).toLocaleString(),
-      },
-
-      {
-        field: "action",
-        headerName:
-          "Action",
-        flex: 1,
-        minWidth: 180,
-
-        sortable: false,
-
-        renderCell:
-          (params) => (
-            <Button
-              color="error"
-              variant="outlined"
-              startIcon={
-                <DeleteIcon />
-              }
-              onClick={() =>
-                handleDeleteClick(
-                  params.row
-                )
-              }
-            >
-              Delete
-            </Button>
-          ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <Box sx={{ p: 3 }}>
-
-      <Paper
-        elevation={3}
+      <Box
         sx={{
-          p: 4,
-          borderRadius: 4,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
         }}
       >
-
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          mb={3}
-        >
-          View Voucher Requests
-        </Typography>
-
-        {/* SEARCH */}
-
+        {/* Voucher Category + Other */}
         <Box
           sx={{
             display: "grid",
             gridTemplateColumns:
-              "1fr 1fr auto",
-            gap: 2,
-            mb: 3,
+              formData.voucherCategory ===
+              "Other"
+                ? "1fr 1fr"
+                : "1fr",
+            gap: 3,
 
-            "@media (max-width:900px)":
-              {
-                gridTemplateColumns:
-                  "1fr",
-              },
+            "@media (max-width:900px)": {
+              gridTemplateColumns: "1fr",
+            },
           }}
         >
+          {/* Voucher Category */}
 
-          {/* SEARCH VID */}
+<FormControl
+  fullWidth
+  error={!!errors.voucherCategory}
+ 
+>
+  <InputLabel >
+    Voucher Category
+  </InputLabel>
 
-          <TextField
-            size="small"
-            label="Search By VID"
-            value={searchVID}
-            onChange={(e) =>
-              setSearchVID(
-                e.target.value
-              )
+  <Select
+    disabled={loading}
+    name="categoryId"
+    value={formData.voucherCategory}
+    onChange={handleChange}
+    label="Voucher Category"
+  >
+    <MenuItem value="">
+      <em>Select Category</em>
+    </MenuItem>
+
+    {voucherCategories?.map(
+      (item, index) => (
+        <MenuItem
+          key={index}
+          value={item}
+        >
+          {item}
+        </MenuItem>
+      )
+    )}
+  </Select>
+  <FormHelperText>
+    {errors.voucherCategory}
+  </FormHelperText>
+</FormControl>
+
+
+
+ 
+          {/* Other Category */}
+          {formData.voucherCategory ===
+            "Other" && (
+            <TextField
+            disabled={loading}
+              fullWidth
+              label="Other Category"
+              name="otherCategory"
+              value={
+                formData.otherCategory
+              }
+              onChange={handleChange}
+              error={
+                !!errors.otherCategory
+              }
+              inputProps={{
+                maxLength: 20,
+              }}
+              helperText={
+                errors.otherCategory
+                  ? errors.otherCategory
+                  : `${formData.otherCategory.length}/20`
+              }
+            />
+          )}
+        </Box>
+
+        {/* Allowed Role + SD Request */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              "1fr 1fr",
+            gap: 3,
+
+            "@media (max-width:900px)": {
+              gridTemplateColumns: "1fr",
+            },
+          }}
+        >
+          {/* Allowed Role */}
+          <FormControl
+            fullWidth
+            error={
+              !!errors.allowedRole
             }
-          />
+          >
+            <InputLabel>
+              Allowed Role
+            </InputLabel>
 
-          {/* SEARCH DATE */}
+            <Select
+            disabled={loading}
+              name="allowedRole"
+              value={
+                formData.allowedRole
+              }
+              label="Allowed Role"
+              onChange={handleChange}
+            >
+              {roles.map((role) => (
+                <MenuItem
+                  key={role.roleId}
+                  value={role.roleId}
+                >
+                  {role.roleName}
+                </MenuItem>
+              ))}
+            </Select>
+             <FormHelperText>
+    {errors.voucherCategory}
+  </FormHelperText>
+          </FormControl>
 
+          {/* SD Request */}
           <TextField
-            size="small"
-            type="date"
-            label="Search By Date"
-            InputLabelProps={{
-              shrink: true,
+          disabled={loading}
+            fullWidth
+            label="SD Request Number"
+            name="sdRequestNumber"
+            value={
+              formData.sdRequestNumber
+            }
+            onChange={handleChange}
+            helperText="Only numbers and commas allowed"
+          />
+        </Box>
+
+        {/* Description */}
+        <TextField
+        disabled={loading}
+          fullWidth
+          multiline
+          rows={5}
+          label="Description"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          error={!!errors.description}
+          inputProps={{
+            maxLength: 500,
+          }}
+          helperText={
+            errors.description
+              ? errors.description
+              : `${formData.description.length}/500`
+          }
+        />
+
+        {/* Buttons */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent:
+              "flex-end",
+            gap: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleReset}
+            sx={{
+              minWidth: "120px",
+              textTransform:
+                "none",
+              borderRadius: "8px",
             }}
-            value={searchDate}
-            onChange={(e) =>
-              setSearchDate(
-                e.target.value
-              )
-            }
-          />
-
-          {/* SEARCH BUTTON */}
+          >
+            Reset
+          </Button>
 
           <Button
             variant="contained"
-            onClick={handleSearch}
+            onClick={handleCreate}
+            disabled={loading}
+            sx={{
+              minWidth: "120px",
+              textTransform:
+                "none",
+              borderRadius: "8px",
+            }}
           >
-            Search
+            {loading
+              ? "Creating..."
+              : "Create"}
           </Button>
-
         </Box>
+      </Box>
+    </Card>
 
-        {/* TABLE */}
+    {/* Success Dialog */}
+    <Dialog
+      open={openDialog}
+      onClose={() =>
+        setOpenDialog(false)
+      }
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle>
+        Voucher Request Created
+      </DialogTitle>
+
+      <DialogContent>
+        <Typography mb={2}>
+          Voucher ID
+        </Typography>
 
         <Box
           sx={{
-            height: 550,
-            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent:
+              "space-between",
+            border:
+              "1px solid #ccc",
+            borderRadius: 2,
+            px: 2,
+            py: 1.5,
+            background: "#f8f9fa",
           }}
         >
-
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            loading={loading}
-            disableRowSelectionOnClick
-            pageSizeOptions={[
-              5,
-              10,
-              20,
-            ]}
-            initialState={{
-              pagination: {
-                paginationModel:
-                  {
-                    pageSize: 10,
-                  },
-              },
-            }}
-          />
-
-        </Box>
-
-      </Paper>
-
-      {/* DELETE DIALOG */}
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() =>
-          setDeleteDialogOpen(false)
-        }
-        fullWidth
-        maxWidth="sm"
-      >
-
-        <DialogTitle>
-          Delete Voucher
-        </DialogTitle>
-
-        <DialogContent>
-
           <Typography
-            sx={{ mb: 2 }}
+            fontWeight={700}
+            color="primary"
           >
-            Please enter
-            mandatory remark
-            before deleting
-            voucher request.
+            {createdVID}
           </Typography>
 
-          <TextField
-            fullWidth
-            required
-            multiline
-            rows={3}
-            label="Remark *"
-            value={deleteRemark}
-            onChange={(e) =>
-              setDeleteRemark(
-                e.target.value
-              )
-            }
-          />
+          <IconButton
+            onClick={() => {
+              navigator.clipboard.writeText(
+                createdVID
+              );
 
-        </DialogContent>
-
-        <DialogActions>
-
-          <Button
-            onClick={() =>
-              setDeleteDialogOpen(
-                false
-              )
-            }
+              setSnackbar({
+                open: true,
+                message:
+                  "Voucher ID copied",
+                severity:
+                  "success",
+              });
+            }}
           >
-            Cancel
-          </Button>
+            <ContentCopyIcon />
+          </IconButton>
+        </Box>
+      </DialogContent>
 
-          <Button
-            color="error"
-            variant="contained"
-            disabled={
-              !deleteRemark.trim()
-            }
-            onClick={handleDelete}
-          >
-            Delete
-          </Button>
-
-        </DialogActions>
-
-      </Dialog>
-
-      {/* SNACKBAR */}
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() =>
-          setSnackbar({
-            ...snackbar,
-            open: false,
-          })
-        }
+      <DialogActions
+        sx={{
+          p: 3,
+          pt: 1,
+        }}
       >
-
-        <Alert
-          severity={
-            snackbar.severity
-          }
-          variant="filled"
+        <Button
+          variant="outlined"
+          onClick={() => {
+            setOpenDialog(false);
+          }}
         >
-          {snackbar.message}
-        </Alert>
+          Create New Voucher
+        </Button>
 
-      </Snackbar>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setOpenDialog(false);
 
-    </Box>
-  );
+            setCurrentScreen(
+              "view"
+            );
+          }}
+        >
+          View Requests
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+    {/* Snackbar */}
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={3000}
+      onClose={() =>
+        setSnackbar((prev) => ({
+          ...prev,
+          open: false,
+        }))
+      }
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        severity={snackbar.severity}
+        variant="filled"
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
+  </Box>
+);
+
+
 };
 
-export default
-ViewVoucherRequestsScreen;
+export default RequestVoucherScreen;
+
