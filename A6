@@ -370,3 +370,34 @@ onClick={async () => {
     console.error(err);
   }
 }}
+
+
+
+
+
+onClick={async () => {
+  try {
+    const response = await callApi(
+      `/ES/api/differences/history?currency=${params.row.currency}&cgl=${params.row.cgl}&branch=${params.row.branchCode}&startDate=${params.row.reconRunDate}&endDate=${params.row.reconRunDate}`,
+      {},
+      "GET"
+    );
+
+    console.log(response);
+
+    setHistoryData(response?.data?.content || []);
+    setOpenHistory(true);
+  } catch (err) {
+    console.error(err);
+  }
+}}
+
+
+
+<DialogContent>
+  {historyData.map((item, index) => (
+    <Typography key={index} sx={{ mb: 1 }}>
+      {item.reconRunDate}
+    </Typography>
+  ))}
+</DialogContent>
