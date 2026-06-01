@@ -345,3 +345,28 @@ const BalanceParticularSearchScreen = () => {
 };
 
 export default BalanceParticularSearchScreen;
+
+
+
+onClick={async () => {
+  try {
+    const response = await callApi(
+      "/ES/differences/history",
+      {
+        currency: params.row.currency,
+        cgl: params.row.cgl,
+        branch: params.row.branchCode,
+        startDate: params.row.reconRunDate,
+        endDate: params.row.reconRunDate,
+      },
+      "POST"
+    );
+
+    console.log("API Response =>", response);
+
+    setSelectedRow(params.row);
+    setOpenHistory(true);
+  } catch (err) {
+    console.error(err);
+  }
+}}
