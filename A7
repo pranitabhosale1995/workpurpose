@@ -1,0 +1,57 @@
+const fetchRoles = async () => {
+  setRoleLoading(true);
+
+  try {
+    const response = await callApi(
+      "/journals/api/allowed-roles?menuId=30",
+      null,
+      "GET"
+    );
+
+    console.log(
+      "Allowed Roles Response =>",
+      response
+    );
+
+    setRoles(
+      Array.isArray(response)
+        ? response
+        : []
+    );
+  } catch (error) {
+    console.error(
+      "Failed to fetch roles",
+      error
+    );
+
+    setSnackbar({
+      open: true,
+      message: "Failed to load roles",
+      severity: "error",
+    });
+  } finally {
+    setRoleLoading(false);
+  }
+};
+
+
+<Select
+  disabled={loading || roleLoading}
+  name="roleId"
+  value={formData.roleId}
+  label="Allowed Role"
+  onChange={handleChange}
+>
+  <MenuItem value="">
+    <em>Select Role</em>
+  </MenuItem>
+
+  {roles?.map((role) => (
+    <MenuItem
+      key={role.roleId}
+      value={role.roleId}
+    >
+      {role.roleName}
+    </MenuItem>
+  ))}
+</Select>
