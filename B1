@@ -224,3 +224,80 @@ const ViewVoucherRequestsScreen = () => {
 export default ViewVoucherRequestsScreen;
 
 
+
+
+<Dialog
+  open={deleteDialogOpen}
+  onClose={() =>
+    setDeleteDialogOpen(false)
+  }
+  fullWidth
+  maxWidth="sm"
+>
+  <DialogTitle>
+    Terminate Voucher
+  </DialogTitle>
+
+  <DialogContent>
+
+    <TextField
+      fullWidth
+      multiline
+      rows={4}
+      label="Remark *"
+      value={deleteRemark}
+      onChange={(e) =>
+        setDeleteRemark(
+          e.target.value
+        )
+      }
+    />
+
+  </DialogContent>
+
+  <DialogActions>
+
+    <Button
+      onClick={() =>
+        setDeleteDialogOpen(false)
+      }
+    >
+      Cancel
+    </Button>
+
+    <Button
+      color="error"
+      variant="contained"
+      disabled={
+        !deleteRemark.trim()
+      }
+      onClick={
+        handleTerminate
+      }
+    >
+      Terminate
+    </Button>
+
+  </DialogActions>
+
+</Dialog>
+
+<Snackbar
+  open={snackbar.open}
+  autoHideDuration={3000}
+  onClose={() =>
+    setSnackbar({
+      ...snackbar,
+      open: false,
+    })
+  }
+>
+  <Alert
+    severity={snackbar.severity}
+    variant="filled"
+  >
+    {snackbar.message}
+  </Alert>
+</Snackbar>
+
+
