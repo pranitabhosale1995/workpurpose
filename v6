@@ -173,3 +173,47 @@ const [
   statusOptions,
   setStatusOptions,
 ] = useState([]);
+
+
+
+
+<Select
+  value={searchStatus}
+  onChange={(e) =>
+    setSearchStatus(e.target.value)
+  }
+>
+  <MenuItem value="">
+    All
+  </MenuItem>
+
+  {statusOptions.map((status) => (
+    <MenuItem
+      key={status}
+      value={status}
+    >
+      {status}
+    </MenuItem>
+  ))}
+</Select>
+
+
+<Select
+  value={searchCategory}
+  onChange={(e) =>
+    setSearchCategory(e.target.value)
+  }
+>
+  <MenuItem value="">
+    All
+  </MenuItem>
+
+  {categoryOptions.map((item) => (
+    <MenuItem
+      key={item.categoryId}
+      value={item.categoryId}
+    >
+      {item.categoryName}
+    </MenuItem>
+  ))}
+</Select>
