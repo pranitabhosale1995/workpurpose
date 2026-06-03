@@ -1,776 +1,550 @@
-
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  FormHelperText,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Snackbar,
-  TextField,
-  Typography,
+  Box, Paper, Typography, Button, TextField, Dialog,
+  DialogTitle, DialogContent, DialogActions, Snackbar,
+  Alert, Accordion, AccordionSummary, AccordionDetails,
+  FormControl, InputLabel, Select, MenuItem
 } from "@mui/material";
-
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-
-import { useNavigate } from "react-router-dom";
-
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import BlockIcon from "@mui/icons-material/Block";
+import { DataGrid } from "@mui/x-data-grid";
 import useApi from "../../hooks/useApi";
 
-import ViewVoucherRequestScreen from "./ViewVoucherRequestScreen";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
-const RequestVoucherScreen = () => {
-  const { user } = useSelector((state) => state.auth);
-
-  const navigate = useNavigate();
-
+const ViewVoucherRequestsScreen = () => {
   const { callApi } = useApi();
 
-  const [currentScreen, setCurrentScreen] =
-    useState("request");
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [voucherCategories, setVoucherCategories] =
-    useState([]);
+  const [searchVID, setSearchVID] = useState("");
 
-  const [roles, setRoles] =
-    useState([]);
+  const [searchStatus, setSearchStatus] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
-  const [loading, setLoading] =
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [deleteRemark, setDeleteRemark] = useState("");
+
+  const [descriptionPopupOpen, setDescriptionPopupOpen] =
     useState(false);
 
-  const [roleLoading, setRoleLoading] =
-    useState(false);
-
-  const [openDialog, setOpenDialog] =
-    useState(false);
-
-  const [createdVID, setCreatedVID] =
+  const [selectedDescription, setSelectedDescription] =
     useState("");
 
-  const [errors, setErrors] =
-    useState({});
+  const [searchDate, setSearchDate] =
+    useState(null);
 
-  const [snackbar, setSnackbar] =
-    useState({
-      open: false,
-      message: "",
-      severity: "success",
-    });
 
-  const [formData, setFormData] =
-    useState({
-      categoryId: "",
-      otherCategory: "",
-      description: "",
-      roleId: "",
-      sdRequestNumber: "",
-    });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
+  // ================
+
+  const [allData, setAllData] =
+    useState([]);
+
+  const [
+    categoryOptions,
+    setCategoryOptions,
+  ] = useState([]);
+
+  const [
+    statusOptions,
+    setStatusOptions,
+  ] = useState([]);
+
+  // ========
   useEffect(() => {
-    fetchRoles();
-    fetchVoucherCategories();
+    fetchDropdownData();
+    fetchVouchers();
   }, []);
 
-  const fetchVoucherCategories =
-    async () => {
-      try {
-        const response = await callApi(
-          "/JS/journals/voucher-categories",
-          null,
-          "GET"
-        );
 
-        console.log(
-          "Voucher Categories Response =>",
-          response
-        );
 
-        const categories =
-          Array.isArray(response)
-            ? response
-            : response?.data || [];
+  const handleViewDescription = (
+    description
+  ) => {
+    setSelectedDescription(
+      description || "-"
+    );
 
-        setVoucherCategories(
-          categories
-        );
-      } catch (error) {
-        console.error(
-          "Category API Error =>",
-          error
-        );
+    setDescriptionPopupOpen(
+      true
+    );
+  };
 
-        setVoucherCategories([]);
-      }
-    };
+  // 8888888888==============================================================
 
-  const fetchRoles = async () => {
-    setRoleLoading(true);
-
+  const fetchDropdownData = async () => {
     try {
+
       const response = await callApi(
-        "/JS/journals/allowed-roles?menuId=30",
+        "/JS/journals/search-vid",
         null,
         "GET"
       );
 
-      console.log(
-        "Allowed Roles Response =>",
-        response
+      const data = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      setAllData(data);
+
+      const categories = [
+        ...new Map(
+          data.map((item) => [
+            item.categoryId,
+            {
+              categoryId:
+                item.categoryId,
+              categoryName:
+                item.categoryName,
+            },
+          ])
+        ).values(),
+      ];
+
+      setCategoryOptions(
+        categories
       );
 
-      setRoles(
+      const statuses = [
+        ...new Set(
+          data.map(
+            (item) => item.status
+          )
+        ),
+      ];
+
+      setStatusOptions(
+        statuses
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Dropdown Error =>",
+        error
+      );
+
+    }
+  };
+
+
+  // =====================================
+
+  const fetchVouchers = async () => {
+    setLoading(true);
+
+    try {
+
+      let url =
+        "/JS/journals/search-vid";
+
+      const queryParams = [];
+
+      // Default table load
+      if (
+        !searchVID &&
+        !searchStatus &&
+        !searchDate &&
+        !searchCategory
+      ) {
+        queryParams.push(
+          "status=AVAILABLE"
+        );
+      }
+
+      if (searchVID) {
+        queryParams.push(
+          `vid=${searchVID}`
+        );
+      }
+
+      if (searchStatus) {
+        queryParams.push(
+          `status=${searchStatus}`
+        );
+      }
+
+      if (searchDate) {
+        queryParams.push(
+          `date=${dayjs(
+            searchDate
+          ).format(
+            "YYYY-MM-DD"
+          )}`
+        );
+      }
+
+      if (searchCategory) {
+        queryParams.push(
+          `categoryId=${searchCategory}`
+        );
+      }
+
+      if (
+        queryParams.length > 0
+      ) {
+        url +=
+          "?" +
+          queryParams.join("&");
+      }
+
+      console.log(
+        "Table URL =>",
+        url
+      );
+
+      const response =
+        await callApi(
+          url,
+          null,
+          "GET"
+        );
+
+      const data =
         Array.isArray(response)
           ? response
-          : []
-      );
+          : response?.data || [];
+
+      setRows(data);
+
     } catch (error) {
+
       console.error(
-        "Failed to fetch roles",
+        "Fetch Error =>",
         error
       );
 
       setSnackbar({
         open: true,
-        message: "Failed to load roles",
+        message:
+          "Failed to fetch vouchers",
         severity: "error",
       });
+
     } finally {
-      setRoleLoading(false);
+
+      setLoading(false);
+
     }
   };
 
 
-  const handleChange = (e) => {
-    const { name, value } =
-      e.target;
-
-    if (
-      name === "description" &&
-      value.length > 500
-    ) {
-      return;
-    }
-
-    if (name === "otherCategory") {
-      const regex =
-        /^[A-Za-z0-9 -]*$/;
-
-      if (!regex.test(value)) {
-        return;
-      }
-
-      if (value.length > 20) {
-        return;
-      }
-    }
-
-    if (
-      name === "sdRequestNumber"
-    ) {
-      const regex =
-        /^[0-9,]*$/;
-
-      if (!regex.test(value)) {
-        return;
-      }
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+  const handleDeleteClick = (row) => {
+    setSelectedRow(row);
+    setDeleteRemark("");
+    setDeleteDialogOpen(true);
   };
 
-  const validateForm = () => {
-    let newErrors = {};
+  const handleTerminate = async () => {
+    try {
+      const payload = {
+        id: selectedRow?.id,
+        terminatedBy: sessionStorage.getItem("userId"),
+        remarks: deleteRemark,
+      };
 
-    if (!formData.categoryId) {
-      newErrors.categoryId =
-        "Voucher Category is required";
-    }
-
-    const selectedCategory =
-      voucherCategories.find(
-        (item) =>
-          item.id ===
-          formData.categoryId
+      await callApi(
+        "/JS/journals/terminate-vid",
+        payload,
+        "POST"
       );
 
-    if (
-      selectedCategory?.categoryName ===
-      "Other" &&
-      !formData.otherCategory.trim()
-    ) {
-      newErrors.otherCategory =
-        "Please enter other category";
+      setDeleteDialogOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: "Voucher terminated successfully",
+        severity: "success",
+      });
+
+      fetchVouchers();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Terminate failed",
+        severity: "error",
+      });
     }
-
-    if (
-      !formData.description.trim()
-    ) {
-      newErrors.description =
-        "Description is required";
-    }
-
-    if (
-      formData.description.length >
-      500
-    ) {
-      newErrors.description =
-        "Maximum 500 Characters Allowed";
-    }
-
-    if (!formData.roleId) {
-      newErrors.roleId =
-        "Allowed Role is required";
-    }
-
-    setErrors(newErrors);
-
-    return (
-      Object.keys(newErrors)
-        .length === 0
-    );
   };
 
-  const handleCreate =
-    async () => {
-      if (!validateForm()) {
-        return;
-      }
+  const columns = useMemo(() => [
+    { field: "vid", headerName: "VID", flex: 1 },
+    { field: "categoryName", headerName: "Category", flex: 1 },
+    { field: "allowedRoleName", headerName: "Role", flex: 1 },
+    { field: "categoryName", headerName: "Category", flex: 1 },
+    { field: "createdByName", headerName: "Created By", flex: 1 },
+    { field: "status", headerName: "Status", flex: 1 },
+    {
+      field: "createdAt",
+      headerName: "Created At",
+      flex: 1.5,
+      renderCell: (params) =>
+        params.value
+          ? new Date(params.value).toLocaleString()
+          : "",
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 1,
 
-      setLoading(true);
-
-      try {
-        const selectedCategory =
-          voucherCategories.find(
-            (item) =>
-              item.id ===
-              formData.categoryId
-          );
-
-        const payload = {
-          categoryId:
-            formData.categoryId,
-
-          customCategory:
-            selectedCategory?.categoryName ===
-              "Other"
-              ? formData.otherCategory
-              : "",
-
-          description:
-            formData.description,
-
-          allowedRole:
-            formData.roleId,
-
-          sdReqNo:
-            formData.sdRequestNumber,
-
-          createdBy: user.userId,
-
-
-        };
-
-        console.log(
-          "Create Payload =>",
-          payload
-        );
-
-        const response =
-          await callApi(
-            "/JS/journals/create-vid",
-            payload,
-            "POST"
-          );
-
-        console.log(
-          "Create Response =>",
-          response
-        );
-
-        await fetchVoucherCategories();
-
-        const createdVid =
-          response?.vid ||
-          response?.data?.vid ||
-          "";
-
-        setCreatedVID(
-          createdVid
-        );
-
-        setOpenDialog(true);
-
-        setSnackbar({
-          open: true,
-          message:
-            "Voucher Request Created Successfully",
-          severity:
-            "success",
-        });
-
-        setFormData({
-          categoryId: "",
-          otherCategory: "",
-          description: "",
-          roleId: "",
-          sdRequestNumber: "",
-
-        });
-
-        setErrors({});
-      } catch (error) {
-        console.error(
-          "Create Voucher Error =>",
-          error
-        );
-
-        setSnackbar({
-          open: true,
-          message:
-            "Failed To Create Voucher",
-          severity: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  const handleReset = () => {
-    setFormData({
-      categoryId: "",
-      otherCategory: "",
-      description: "",
-      roleId: "",
-      sdRequestNumber: "",
-    });
-
-    setErrors({});
-  };
-
-  if (currentScreen === "view") {
-    return (
-      <ViewVoucherRequestScreen />
-    );
-  }
+      renderCell: (params) => (
+        <Button
+          variant="text"
+          onClick={() =>
+            handleViewDescription(
+              params.row.description
+            )
+          }
+        >
+          View
+        </Button>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.status === "AVAILABLE" ? (
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<BlockIcon />}
+            onClick={() => handleDeleteClick(params.row)}
+          >
+            Terminate
+          </Button>
+        ) : null,
+    },
+  ], []);
 
   return (
-    <Box p={4}>
-      <Card
-        elevation={3}
-        sx={{
-          maxWidth: "1100px",
-          margin: "40px auto",
-          padding: 4,
-          borderRadius: 3,
-        }}
-      >
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          mb={4}
-          color="primary"
-        >
-          Request Voucher
+    <Box sx={{ p: 3 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" mb={2}>
+          View Voucher Requests
         </Typography>
 
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection:
-              "column",
-            gap: 3,
-          }}
-        >
-          {/* Voucher Category + Other */}
-          <Box
-            sx={{
+        <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Search Filters</Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <Box sx={{
               display: "grid",
-              gridTemplateColumns:
-                voucherCategories.find(
-                  (item) =>
-                    item.id ===
-                    formData.categoryId &&
-                    item.categoryName ===
-                    "Other"
-                )
-                  ? "1fr 1fr"
-                  : "1fr",
+              gridTemplateColumns: "repeat(5,1fr)",
+              gap: 2
+            }}>
 
-              gap: 3,
+              <TextField
+                label="VID"
+                size="small"
+                value={searchVID}
+                onChange={(e) => setSearchVID(e.target.value)}
+              />
 
-              "@media (max-width:900px)":
-              {
-                gridTemplateColumns:
-                  "1fr",
-              },
-            }}
-          >
-            {/* Voucher Category */}
-            <FormControl
-              fullWidth
-              error={
-                !!errors.categoryId
-              }
-            >
-              <InputLabel>
-                Voucher Category
-              </InputLabel>
-
-              <Select
-                disabled={loading}
-                name="categoryId"
-                value={
-                  formData.categoryId
-                }
-                onChange={
-                  handleChange
-                }
-                label="Voucher Category"
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
               >
-                <MenuItem value="">
-                  <em>
-                    Select Category
-                  </em>
-                </MenuItem>
-
-                {voucherCategories?.map(
-                  (item) => (
-                    <MenuItem
-                      key={item.id}
-                      value={item.id}
-                    >
-                      {
-                        item.categoryName
-                      }
-                    </MenuItem>
-                  )
-                )}
-              </Select>
-
-              <FormHelperText>
-                {
-                  errors.categoryId
-                }
-              </FormHelperText>
-            </FormControl>
-
-            {/* Other Category */}
-            {voucherCategories.find(
-              (item) =>
-                item.id ===
-                formData.categoryId &&
-                item.categoryName ===
-                "Other"
-            ) && (
-                <TextField
-                  disabled={loading}
-                  fullWidth
-                  label="Other Category"
-                  name="otherCategory"
-                  value={
-                    formData.otherCategory
+                <DatePicker
+                  disableFuture
+                  label="Date"
+                  value={searchDate}
+                  onChange={(newValue) =>
+                    setSearchDate(newValue)
                   }
-                  onChange={
-                    handleChange
-                  }
-                  error={
-                    !!errors.otherCategory
-                  }
-                  inputProps={{
-                    maxLength: 20,
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      fullWidth: true,
+                    },
                   }}
-                  helperText={
-                    errors.otherCategory
-                      ? errors.otherCategory
-                      : `${formData.otherCategory.length}/20`
-                  }
                 />
-              )}
-          </Box>
+              </LocalizationProvider>
 
-          {/* Allowed Role + SD */}
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns:
-                "1fr 1fr",
-              gap: 3,
-
-              "@media (max-width:900px)":
-              {
-                gridTemplateColumns:
-                  "1fr",
-              },
-            }}
-          >
-            {/* Role */}
-            <FormControl
-              fullWidth
-              error={
-                !!errors.roleId
-              }
-            >
-              <InputLabel>
-                Allowed Role
-              </InputLabel>
-              <Select
-                disabled={loading || roleLoading}
-                name="roleId"
-                value={formData.roleId}
-                label="Allowed Role"
-                onChange={handleChange}
-              >
-                <MenuItem value="">
-                  <em>Select Role</em>
-                </MenuItem>
-
-                {roles?.map((role) => (
-                  <MenuItem
-                    key={role.roleId}
-                    value={role.roleId}
-                  >
-                    {role.roleName}
+              <FormControl size="small">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={searchStatus}
+                  onChange={(e) =>
+                    setSearchStatus(e.target.value)
+                  }
+                >
+                  <MenuItem value="">
+                    All
                   </MenuItem>
-                ))}
-              </Select>
 
+                  {statusOptions.map((status) => (
+                    <MenuItem
+                      key={status}
+                      value={status}
+                    >
+                      {status}
+                    </MenuItem>
+                  ))}
+                </Select>
 
-              <FormHelperText>
-                {errors.roleId}
-              </FormHelperText>
-            </FormControl>
+              </FormControl>
 
-            {/* SD */}
-            <TextField
-              disabled={loading}
-              fullWidth
-              label="SD Request Number"
-              name="sdRequestNumber"
-              value={
-                formData.sdRequestNumber
-              }
-              onChange={
-                handleChange
-              }
-              helperText="Only numbers and commas allowed"
-            />
-          </Box>
+              <FormControl size="small">
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={searchCategory}
+                  onChange={(e) =>
+                    setSearchCategory(e.target.value)
+                  }
+                >
+                  <MenuItem value="">
+                    All
+                  </MenuItem>
 
-          {/* Description */}
-          <TextField
-            disabled={loading}
-            fullWidth
-            multiline
-            rows={5}
-            label="Description"
-            name="description"
-            value={
-              formData.description
-            }
-            onChange={
-              handleChange
-            }
-            error={
-              !!errors.description
-            }
-            inputProps={{
-              maxLength: 500,
-            }}
-            helperText={
-              errors.description
-                ? errors.description
-                : `${formData.description.length}/500`
-            }
+                  {categoryOptions.map((item) => (
+                    <MenuItem
+                      key={item.categoryId}
+                      value={item.categoryId}
+                    >
+                      {item.categoryName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Button variant="contained" onClick={fetchVouchers}>
+                Search
+              </Button>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+
+        <Box sx={{ height: 550, mt: 2 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            loading={loading}
           />
-
-          {/* Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent:
-                "flex-end",
-              gap: 2,
-            }}
-          >
-            <Button
-              variant="outlined"
-              onClick={
-                handleReset
-              }
-              disabled={loading}
-              sx={{
-                minWidth:
-                  "120px",
-                textTransform:
-                  "none",
-                borderRadius:
-                  "8px",
-              }}
-            >
-              Reset
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={
-                handleCreate
-              }
-              disabled={loading}
-              sx={{
-                minWidth:
-                  "120px",
-                textTransform:
-                  "none",
-                borderRadius:
-                  "8px",
-              }}
-            >
-              {loading
-                ? "Creating..."
-                : "Create"}
-            </Button>
-          </Box>
         </Box>
-      </Card>
-
-      {/* Success Dialog */}
+      </Paper>
       <Dialog
-        open={openDialog}
+        open={deleteDialogOpen}
         onClose={() =>
-          setOpenDialog(false)
+          setDeleteDialogOpen(false)
         }
-        maxWidth="xs"
         fullWidth
+        maxWidth="sm"
       >
         <DialogTitle>
-          Voucher Request Created
+          Terminate Voucher
         </DialogTitle>
 
         <DialogContent>
-          <Typography mb={2}>
-            Voucher ID
-          </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems:
-                "center",
-              justifyContent:
-                "space-between",
-              border:
-                "1px solid #ccc",
-              borderRadius: 2,
-              px: 2,
-              py: 1.5,
-              background:
-                "#f8f9fa",
-            }}
-          >
-            <Typography
-              fontWeight={700}
-              color="primary"
-            >
-              {createdVID}
-            </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Remark *"
+            value={deleteRemark}
+            onChange={(e) =>
+              setDeleteRemark(
+                e.target.value
+              )
+            }
+          />
 
-            <IconButton
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  createdVID
-                );
-
-                setSnackbar({
-                  open: true,
-                  message:
-                    "Voucher ID copied",
-                  severity:
-                    "success",
-                });
-              }}
-            >
-              <ContentCopyIcon />
-            </IconButton>
-          </Box>
         </DialogContent>
 
-        <DialogActions
-          sx={{
-            p: 3,
-            pt: 1,
-          }}
-        >
+        <DialogActions>
+
           <Button
-            variant="outlined"
             onClick={() =>
-              setOpenDialog(
+              setDeleteDialogOpen(false)
+            }
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="error"
+            variant="contained"
+            disabled={
+              !deleteRemark.trim()
+            }
+            onClick={
+              handleTerminate
+            }
+          >
+            Terminate
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
+      <Dialog
+        open={descriptionPopupOpen}
+        onClose={() =>
+          setDescriptionPopupOpen(
+            false
+          )
+        }
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          Description
+        </DialogTitle>
+
+        <DialogContent>
+
+          <Typography>
+            {selectedDescription}
+          </Typography>
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button
+            onClick={() =>
+              setDescriptionPopupOpen(
                 false
               )
             }
           >
-            Create New Voucher
+            Close
           </Button>
 
-          <Button
-            variant="contained"
-            onClick={() => {
-              setOpenDialog(
-                false
-              );
-
-              setCurrentScreen(
-                "view"
-              );
-            }}
-          >
-            View Requests
-          </Button>
         </DialogActions>
+
       </Dialog>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={
-          3000
-        }
+        autoHideDuration={3000}
         onClose={() =>
-          setSnackbar(
-            (prev) => ({
-              ...prev,
-              open: false,
-            })
-          )
+          setSnackbar({
+            ...snackbar,
+            open: false,
+          })
         }
-        anchorOrigin={{
-          vertical: "top",
-          horizontal:
-            "right",
-        }}
       >
         <Alert
-          severity={
-            snackbar.severity
-          }
+          severity={snackbar.severity}
           variant="filled"
         >
           {snackbar.message}
@@ -780,4 +554,4 @@ const RequestVoucherScreen = () => {
   );
 };
 
-export default RequestVoucherScreen;
+export default ViewVoucherRequestsScreen;
