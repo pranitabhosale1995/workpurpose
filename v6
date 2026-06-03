@@ -1,84 +1,142 @@
 
-const fetchVouchers = async () => {
-  setLoading(true);
-
+const fetchDropdownData = async () => {
   try {
-    let url = "/JS/journals/search-vid";
-
-    const queryParams = [];
-
-    // Default page load -> AVAILABLE only
-    if (
-      !searchVID &&
-      !searchStatus &&
-      !searchDate &&
-      !searchCategory
-    ) {
-      queryParams.push("status=AVAILABLE");
-    }
-
-    // Status selected by user
-    if (searchStatus) {
-      queryParams.push(
-        `status=${searchStatus}`
-      );
-    }
-
-    // VID Search
-    if (searchVID) {
-      queryParams.push(
-        `vid=${searchVID}`
-      );
-    }
-
-    // Date Search
-    if (searchDate) {
-      queryParams.push(
-        `date=${dayjs(searchDate).format(
-          "YYYY-MM-DD"
-        )}`
-      );
-    }
-
-    // Category Search
-    if (searchCategory) {
-      queryParams.push(
-        `categoryId=${searchCategory}`
-      );
-    }
-
-    if (queryParams.length > 0) {
-      url +=
-        "?" +
-        queryParams.join("&");
-    }
-
-    console.log(
-      "Final URL =>",
-      url
-    );
 
     const response = await callApi(
-      url,
+      "/JS/journals/search-vid",
       null,
       "GET"
-    );
-
-    console.log(
-      "Response =>",
-      response
     );
 
     const data = Array.isArray(response)
       ? response
       : response?.data || [];
 
+    setAllData(data);
+
+    const categories = [
+      ...new Map(
+        data.map((item) => [
+          item.categoryId,
+          {
+            categoryId:
+              item.categoryId,
+            categoryName:
+              item.categoryName,
+          },
+        ])
+      ).values(),
+    ];
+
+    setCategoryOptions(
+      categories
+    );
+
+    const statuses = [
+      ...new Set(
+        data.map(
+          (item) => item.status
+        )
+      ),
+    ];
+
+    setStatusOptions(
+      statuses
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Dropdown Error =>",
+      error
+    );
+
+  }
+};
+
+
+
+const fetchVouchers = async () => {
+  setLoading(true);
+
+  try {
+
+    let url =
+      "/JS/journals/search-vid";
+
+    const queryParams = [];
+
+    // Default table load
+    if (
+      !searchVID &&
+      !searchStatus &&
+      !searchDate &&
+      !searchCategory
+    ) {
+      queryParams.push(
+        "status=AVAILABLE"
+      );
+    }
+
+    if (searchVID) {
+      queryParams.push(
+        `vid=${searchVID}`
+      );
+    }
+
+    if (searchStatus) {
+      queryParams.push(
+        `status=${searchStatus}`
+      );
+    }
+
+    if (searchDate) {
+      queryParams.push(
+        `date=${dayjs(
+          searchDate
+        ).format(
+          "YYYY-MM-DD"
+        )}`
+      );
+    }
+
+    if (searchCategory) {
+      queryParams.push(
+        `categoryId=${searchCategory}`
+      );
+    }
+
+    if (
+      queryParams.length > 0
+    ) {
+      url +=
+        "?" +
+        queryParams.join("&");
+    }
+
+    console.log(
+      "Table URL =>",
+      url
+    );
+
+    const response =
+      await callApi(
+        url,
+        null,
+        "GET"
+      );
+
+    const data =
+      Array.isArray(response)
+        ? response
+        : response?.data || [];
+
     setRows(data);
 
   } catch (error) {
 
     console.error(
-      "Fetch Voucher Error =>",
+      "Fetch Error =>",
       error
     );
 
@@ -97,78 +155,21 @@ const fetchVouchers = async () => {
 };
 
 
-const [descriptionPopupOpen, setDescriptionPopupOpen] =
-  useState(false);
+useEffect(() => {
+  fetchDropdownData();
+  fetchVouchers();
+}, []);
 
-const [selectedDescription, setSelectedDescription] =
-  useState("");
 
+const [allData, setAllData] =
+  useState([]);
 
-const handleViewDescription = (
-  description
-) => {
-  setSelectedDescription(
-    description || "-"
-  );
+const [
+  categoryOptions,
+  setCategoryOptions,
+] = useState([]);
 
-  setDescriptionPopupOpen(
-    true
-  );
-};
-
-{
-  field: "description",
-  headerName: "Description",
-  flex: 1,
-
-  renderCell: (params) => (
-    <Button
-      variant="text"
-      onClick={() =>
-        handleViewDescription(
-          params.row.description
-        )
-      }
-    >
-      View
-    </Button>
-  ),
-}
-
-<Dialog
-  open={descriptionPopupOpen}
-  onClose={() =>
-    setDescriptionPopupOpen(
-      false
-    )
-  }
-  fullWidth
-  maxWidth="sm"
->
-  <DialogTitle>
-    Description
-  </DialogTitle>
-
-  <DialogContent>
-
-    <Typography>
-      {selectedDescription}
-    </Typography>
-
-  </DialogContent>
-
-  <DialogActions>
-
-    <Button
-      onClick={() =>
-        setDescriptionPopupOpen(
-          false
-        )
-      }
-    >
-      Close
-    </Button>
-
-  </DialogActions>
-
-</Dialog>
+const [
+  statusOptions,
+  setStatusOptions,
+] = useState([]);
