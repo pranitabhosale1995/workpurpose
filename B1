@@ -1,14 +1,11 @@
-ViewVoucherRequestsScreen.jsx
-// Updated ViewVoucherRequestsScreen.jsx
-// NOTE: Category dropdown is currently hardcoded.
-// Terminate API is not yet integrated.
+Full Updated ViewVoucherRequestsScreen.jsx
 
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  Box, Paper, Typography, Button, TextField, Dialog, DialogTitle,
-  DialogContent, DialogActions, Snackbar, Alert, Accordion,
-  AccordionSummary, AccordionDetails, FormControl, InputLabel,
-  Select, MenuItem
+  Box, Paper, Typography, Button, TextField, Dialog,
+  DialogTitle, DialogContent, DialogActions, Snackbar,
+  Alert, Accordion, AccordionSummary, AccordionDetails,
+  FormControl, InputLabel, Select, MenuItem
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import BlockIcon from "@mui/icons-material/Block";
@@ -37,26 +34,39 @@ const ViewVoucherRequestsScreen = () => {
     severity: "success",
   });
 
-  useEffect(() => { fetchVouchers(); }, []);
+  useEffect(() => {
+    fetchVouchers();
+  }, []);
 
   const fetchVouchers = async () => {
     setLoading(true);
+
     try {
       let url = "/JS/journals/search-vid";
       const queryParams = [];
 
       if (searchVID) queryParams.push(`vid=${searchVID}`);
-      if (searchDate) queryParams.push(`createdDate=${searchDate}`);
+      if (searchDate) queryParams.push(`date=${searchDate}`);
       if (searchStatus) queryParams.push(`status=${searchStatus}`);
       if (searchCategory) queryParams.push(`categoryId=${searchCategory}`);
 
-      if (queryParams.length) url += "?" + queryParams.join("&");
+      if (queryParams.length > 0) {
+        url += "?" + queryParams.join("&");
+      }
 
       const response = await callApi(url, null, "GET");
-      const data = Array.isArray(response) ? response : response?.data || [];
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
       setRows(data);
-    } catch (e) {
-      setSnackbar({ open: true, message: "Failed to fetch vouchers", severity: "error" });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch vouchers",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -69,14 +79,35 @@ const ViewVoucherRequestsScreen = () => {
   };
 
   const handleTerminate = async () => {
-    if (!deleteRemark.trim()) return;
+    try {
+      const payload = {
+        id: selectedRow?.id,
+        terminatedBy: sessionStorage.getItem("userId"),
+        remarks: deleteRemark,
+      };
 
-    setDeleteDialogOpen(false);
-    setSnackbar({
-      open: true,
-      message: "Voucher terminated successfully",
-      severity: "success",
-    });
+      await callApi(
+        "/JS/journals/terminate-vid",
+        payload,
+        "POST"
+      );
+
+      setDeleteDialogOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: "Voucher terminated successfully",
+        severity: "success",
+      });
+
+      fetchVouchers();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Terminate failed",
+        severity: "error",
+      });
+    }
   };
 
   const columns = useMemo(() => [
@@ -84,7 +115,15 @@ const ViewVoucherRequestsScreen = () => {
     { field: "categoryName", headerName: "Category", flex: 1 },
     { field: "createdByName", headerName: "Created By", flex: 1 },
     { field: "status", headerName: "Status", flex: 1 },
-    { field: "createdAt", headerName: "Created At", flex: 1.5 },
+    {
+      field: "createdAt",
+      headerName: "Created At",
+      flex: 1.5,
+      renderCell: (params) =>
+        params.value
+          ? new Date(params.value).toLocaleString()
+          : "",
+    },
     {
       field: "action",
       headerName: "Action",
@@ -103,7 +142,83 @@ const ViewVoucherRequestsScreen = () => {
     },
   ], []);
 
-  return <div>Updated Screen</div>;
+  return (
+    <Box sx={{ p: 3 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" mb={2}>
+          View Voucher Requests
+        </Typography>
+
+        <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Search Filters</Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <Box sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5,1fr)",
+              gap: 2
+            }}>
+
+              <TextField
+                label="VID"
+                size="small"
+                value={searchVID}
+                onChange={(e) => setSearchVID(e.target.value)}
+              />
+
+              <TextField
+                type="date"
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+              />
+
+              <FormControl size="small">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={searchStatus}
+                  label="Status"
+                  onChange={(e) => setSearchStatus(e.target.value)}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="AVAILABLE">AVAILABLE</MenuItem>
+                  <MenuItem value="TERMINATED">TERMINATED</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl size="small">
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={searchCategory}
+                  label="Category"
+                  onChange={(e) => setSearchCategory(e.target.value)}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="3">CGL Suspense</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Button variant="contained" onClick={fetchVouchers}>
+                Search
+              </Button>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+
+        <Box sx={{ height: 550, mt: 2 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            loading={loading}
+          />
+        </Box>
+      </Paper>
+    </Box>
+  );
 };
 
 export default ViewVoucherRequestsScreen;
