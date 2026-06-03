@@ -1,0 +1,3 @@
+const [voucherCategories, setVoucherCategories] = useState([]);
+
+const [voucherStatuses, setVoucherStatuses] = useState([]);
