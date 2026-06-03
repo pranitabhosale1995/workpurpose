@@ -1,3 +1,67 @@
 const [voucherCategories, setVoucherCategories] = useState([]);
 
 const [voucherStatuses, setVoucherStatuses] = useState([]);
+
+const fetchVoucherCategories = async () => {
+  try {
+    const response = await callApi(
+      "/JS/journals/voucher-categories",
+      null,
+      "GET"
+    );
+
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    setVoucherCategories(data);
+
+  } catch (error) {
+    console.error(error);
+    setVoucherCategories([]);
+  }
+};
+
+const fetchVoucherStatuses = async () => {
+  try {
+    const response = await callApi(
+      "/JS/journals/voucher-statuses",
+      null,
+      "GET"
+    );
+
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    setVoucherStatuses(data);
+
+  } catch (error) {
+    console.error(error);
+    setVoucherStatuses([]);
+  }
+};
+
+useEffect(() => {
+  fetchVoucherCategories();
+  fetchVoucherStatuses();
+  fetchVouchers();
+}, []);
+
+{voucherStatuses.map((item, index) => (
+  <MenuItem
+    key={index}
+    value={item.value}
+  >
+    {item.value}
+  </MenuItem>
+))}
+
+{voucherCategories.map((item) => (
+  <MenuItem
+    key={item.id}
+    value={item.id}
+  >
+    {item.categoryName}
+  </MenuItem>
+))}
