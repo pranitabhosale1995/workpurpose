@@ -8,11 +8,16 @@ const fetchVouchers = async () => {
     const queryParams = [];
 
     // Default page load -> AVAILABLE only
-    if (!searchVID && !searchStatus) {
+    if (
+      !searchVID &&
+      !searchStatus &&
+      !searchDate &&
+      !searchCategory
+    ) {
       queryParams.push("status=AVAILABLE");
     }
 
-    // User selected status
+    // Status selected by user
     if (searchStatus) {
       queryParams.push(
         `status=${searchStatus}`
@@ -48,12 +53,20 @@ const fetchVouchers = async () => {
         queryParams.join("&");
     }
 
-    console.log("API URL =>", url);
+    console.log(
+      "Final URL =>",
+      url
+    );
 
     const response = await callApi(
       url,
       null,
       "GET"
+    );
+
+    console.log(
+      "Response =>",
+      response
     );
 
     const data = Array.isArray(response)
