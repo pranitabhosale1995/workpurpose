@@ -95,3 +95,80 @@ const fetchVouchers = async () => {
 
   }
 };
+
+
+const [descriptionPopupOpen, setDescriptionPopupOpen] =
+  useState(false);
+
+const [selectedDescription, setSelectedDescription] =
+  useState("");
+
+
+const handleViewDescription = (
+  description
+) => {
+  setSelectedDescription(
+    description || "-"
+  );
+
+  setDescriptionPopupOpen(
+    true
+  );
+};
+
+{
+  field: "description",
+  headerName: "Description",
+  flex: 1,
+
+  renderCell: (params) => (
+    <Button
+      variant="text"
+      onClick={() =>
+        handleViewDescription(
+          params.row.description
+        )
+      }
+    >
+      View
+    </Button>
+  ),
+}
+
+<Dialog
+  open={descriptionPopupOpen}
+  onClose={() =>
+    setDescriptionPopupOpen(
+      false
+    )
+  }
+  fullWidth
+  maxWidth="sm"
+>
+  <DialogTitle>
+    Description
+  </DialogTitle>
+
+  <DialogContent>
+
+    <Typography>
+      {selectedDescription}
+    </Typography>
+
+  </DialogContent>
+
+  <DialogActions>
+
+    <Button
+      onClick={() =>
+        setDescriptionPopupOpen(
+          false
+        )
+      }
+    >
+      Close
+    </Button>
+
+  </DialogActions>
+
+</Dialog>
