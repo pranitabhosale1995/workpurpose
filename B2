@@ -1,42 +1,19 @@
-const columns = useMemo(() => {
-  const cols = [
-    {
-      field: "vid",
-      headerName: "VID",
-      flex: 1,
-    },
+ const columns = useMemo(() => [
+    { field: "vid", headerName: "VID", flex: 1 },
+    { field: "categoryName", headerName: "Category", flex: 1 },
+    { field: "allowedRoleName", headerName: "Role", flex: 1 },
+    { field: "categoryName", headerName: "Category", flex: 1 },
 
-    {
-      field: "categoryName",
-      headerName: "Category",
-      flex: 1,
-    },
-
-    {
-      field: "allowedRoleName",
-      headerName: "Role",
-      flex: 1,
-    },
-
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-    },
-
+    { field: "status", headerName: "Status", flex: 1 },
     {
       field: "createdAt",
       headerName: "Created At",
       flex: 1.5,
-
       renderCell: (params) =>
         params.value
-          ? new Date(
-              params.value
-            ).toLocaleString()
+          ? new Date(params.value).toLocaleString()
           : "",
     },
-
     {
       field: "description",
       headerName: "Description",
@@ -55,57 +32,48 @@ const columns = useMemo(() => {
         </Button>
       ),
     },
-  ];
-
-  // Remark column only for TERMINATED search
-  if (
-    searchStatus ===
-    "TERMINATED"
-  ) {
-    cols.push({
+    {
       field: "remarks",
       headerName: "Remark",
       flex: 1,
 
-      renderCell: (params) => (
-        <Button
-          variant="text"
-          onClick={() =>
-            handleViewRemark(
-              params.row.remarks
-            )
-          }
-        >
-          View
-        </Button>
-      ),
-    });
-  }
+      renderCell: (params) => {
 
-  cols.push({
-    field: "action",
-    headerName: "Action",
-    flex: 1,
+        if (
+          params.row.status !==
+          "TERMINATED"
+        ) {
+          return "-";
+        }
 
-    renderCell: (params) =>
-      params.row.status ===
-      "AVAILABLE" ? (
-        <Button
-          color="error"
-          variant="contained"
-          startIcon={
-            <BlockIcon />
-          }
-          onClick={() =>
-            handleDeleteClick(
-              params.row
-            )
-          }
-        >
-          Terminate
-        </Button>
-      ) : null,
-  });
-
-  return cols;
-}, [searchStatus]);
+        return (
+          <Button
+            variant="text"
+            onClick={() =>
+              handleViewRemark(
+                params.row.remarks
+              )
+            }
+          >
+            View
+          </Button>
+        );
+      },
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.status === "ACTIVE" ? (
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<BlockIcon />}
+            onClick={() => handleDeleteClick(params.row)}
+          >
+            Terminate
+          </Button>
+        ) : null,
+    },
+  ], []);
