@@ -145,3 +145,12 @@ const handleReset = async () => {
       alignItems: "center",
     }}
   >
+
+
+<Typography
+  variant="body2"
+  color="error"
+  sx={{ mb: 2 }}
+>
+  Note: Terminating this voucher request will permanently disable this VID. No new voucher can be created using this VID in the future.
+</Typography>
