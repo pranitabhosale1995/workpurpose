@@ -1,0 +1,120 @@
+<Dialog
+  open={openHistory}
+  onClose={() => setOpenHistory(false)}
+  fullWidth
+  maxWidth="sm"
+>
+  <DialogTitle sx={{ fontWeight: 700 }}>
+    Difference History
+
+    <IconButton
+      onClick={() => setOpenHistory(false)}
+      sx={{ position: "absolute", right: 8, top: 8 }}
+    >
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
+
+  <DialogContent dividers>
+    {historyData?.length > 0 ? (
+      <>
+        <Paper
+          elevation={1}
+          sx={{
+            p: 2,
+            mb: 3,
+            bgcolor: "#f5f7ff",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="subtitle2" color="text.secondary">
+            First Error Date
+          </Typography>
+
+          <Typography variant="h6" fontWeight={700}>
+            {historyData[0]?.firstErrorDate}
+          </Typography>
+
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            CGL : {historyData[0]?.cgl}
+          </Typography>
+
+          <Typography variant="body2">
+            Branch : {historyData[0]?.branchCode}
+          </Typography>
+        </Paper>
+
+        {historyData.map((item, index) => (
+          <Paper
+            key={index}
+            elevation={2}
+            sx={{
+              p: 2,
+              mb: 2,
+              borderRadius: 2,
+              borderLeft: "4px solid #1976d2",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              fontWeight={700}
+              sx={{ mb: 1 }}
+            >
+              Recon Run Date : {item.reconRunDate}
+            </Typography>
+
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 1,
+              }}
+            >
+              <Typography>
+                Difference :
+                <strong>
+                  {" "}
+                  {item.differenceAmount?.toLocaleString()}
+                </strong>
+              </Typography>
+
+              <Typography>
+                Diff Yesterday :
+                <strong>
+                  {" "}
+                  {item.diffBwYesterday?.toLocaleString()}
+                </strong>
+              </Typography>
+            </Box>
+
+            <Typography
+              sx={{
+                mt: 1,
+                fontWeight: 700,
+                color:
+                  item.status === "Close"
+                    ? "success.main"
+                    : "warning.main",
+              }}
+            >
+              Status : {item.status}
+            </Typography>
+          </Paper>
+        ))}
+      </>
+    ) : (
+      <Typography align="center">
+        No History Available
+      </Typography>
+    )}
+  </DialogContent>
+
+  <DialogActions>
+    <Button
+      variant="contained"
+      onClick={() => setOpenHistory(false)}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
