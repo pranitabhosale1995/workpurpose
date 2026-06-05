@@ -1,0 +1,100 @@
+<Button
+  variant="outlined"
+  onClick={() => {
+    setSearchVID("");
+    setSearchStatus("");
+    setSearchCategory("");
+    setSearchDate(null);
+
+    setTimeout(() => {
+      fetchVouchers();
+    }, 100);
+  }}
+>
+  Reset
+</Button>
+
+
+const [remarkPopupOpen, setRemarkPopupOpen] =
+  useState(false);
+
+const [selectedRemark, setSelectedRemark] =
+  useState("");
+
+
+const handleViewRemark = (
+  remark
+) => {
+  setSelectedRemark(
+    remark || "-"
+  );
+
+  setRemarkPopupOpen(
+    true
+  );
+};
+
+
+{
+  field: "remarks",
+  headerName: "Remark",
+  flex: 1,
+
+  renderCell: (params) => {
+
+    if (
+      params.row.status !==
+      "TERMINATED"
+    ) {
+      return "-";
+    }
+
+    return (
+      <Button
+        variant="text"
+        onClick={() =>
+          handleViewRemark(
+            params.row.remarks
+          )
+        }
+      >
+        View
+      </Button>
+    );
+  },
+},
+
+
+<Dialog
+  open={remarkPopupOpen}
+  onClose={() =>
+    setRemarkPopupOpen(false)
+  }
+  fullWidth
+  maxWidth="sm"
+>
+  <DialogTitle>
+    Termination Remark
+  </DialogTitle>
+
+  <DialogContent>
+
+    <Typography>
+      {selectedRemark}
+    </Typography>
+
+  </DialogContent>
+
+  <DialogActions>
+
+    <Button
+      onClick={() =>
+        setRemarkPopupOpen(false)
+      }
+    >
+      Close
+    </Button>
+
+  </DialogActions>
+
+</Dialog>
