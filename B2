@@ -132,3 +132,16 @@ const handleReset = async () => {
 >
   Reset
 </Button>
+
+
+
+<AccordionDetails>
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns:
+        "1.3fr 1.3fr 1.2fr 1.2fr auto auto",
+      gap: 2,
+      alignItems: "center",
+    }}
+  >
