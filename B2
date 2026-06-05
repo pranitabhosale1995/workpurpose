@@ -97,3 +97,38 @@ const columns = useMemo(() => {
 
   return cols;
 }, [searchStatus]);
+
+
+const handleReset = async () => {
+  setSearchVID("");
+  setSearchStatus("");
+  setSearchCategory("");
+  setSearchDate(null);
+
+  setLoading(true);
+
+  try {
+    const response = await callApi(
+      "/JS/journals/search-vid?status=ACTIVE",
+      null,
+      "GET"
+    );
+
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    setRows(data);
+
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+<Button
+  variant="outlined"
+  onClick={handleReset}
+>
+  Reset
+</Button>
