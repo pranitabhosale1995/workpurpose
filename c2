@@ -211,3 +211,48 @@
     Reset
   </Button>
 </Box>
+
+
+
+const validate = () => {
+  const temp = {};
+
+  if (!fromDate) {
+    temp.fromDate = "From Date is required";
+  }
+
+  if (!toDate) {
+    temp.toDate = "To Date is required";
+  }
+
+  if (
+    fromDate &&
+    dayjs(fromDate).isAfter(
+      dayjs(),
+      "day"
+    )
+  ) {
+    temp.fromDate =
+      "Future date is not allowed";
+  }
+
+  if (
+    toDate &&
+    dayjs(toDate).isAfter(
+      dayjs(),
+      "day"
+    )
+  ) {
+    temp.toDate =
+      "Future date is not allowed";
+  }
+
+  setErrors(temp);
+
+  return (
+    Object.keys(temp).length === 0
+  );
+};
+
+
+maxDate={dayjs()}
