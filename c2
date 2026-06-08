@@ -1,205 +1,48 @@
-const response = await api.post(
-  "/api/voucher-transactions/search",
-  payload
-);
-
-console.log("FULL RESPONSE =>", response);
-console.log("RESPONSE DATA =>", response.data);
-console.log("CONTENT =>", response?.data?.data?.content);
-
-
-const result = response?.data?.data;
-
-console.log("RESULT =>", result);
+const [showTable, setShowTable] = useState(false);
 
 setRows(
-  (result?.content || []).map((item, index) => ({
-    id: `${item.transactionId}-${index}`,
+  (data.content || []).map((item) => ({
+    id: item.transactionId,
     ...item,
   }))
 );
 
-setRowCount(result?.totalElements || 0);
+setRowCount(data.totalElements || 0);
 
+// ADD THIS
+setShowTable(true);
 
-<DataGrid
-  rows={rows}
-  columns={columns}
-  getRowId={(row) =>
-    `${row.transactionId}-${row.batchId}`
-  }
+const handleReset = () => {
+  setAssetClassification("");
+  setFromDate(null);
+  setToDate(null);
 
+  setRows([]);
+  setRowCount(0);
 
+  setPaginationModel({
+    page: 0,
+    pageSize: 25,
+  });
 
+  setErrors({});
 
-
-const handleSearch = async (
-  page = paginationModel.page,
-  pageSize = paginationModel.pageSize
-) => {
-  if (!validate()) return;
-
-  try {
-    setLoading(true);
-
-    const payload = {
-      acClassification: assetClassification,
-      fromDate: dayjs(fromDate).format("DD-MM-YYYY"),
-      toDate: dayjs(toDate).format("DD-MM-YYYY"),
-      pageNumber: page,
-      pageSize: pageSize,
-    };
-
-    console.log("Payload =>", payload);
-
-    const response = await callApi(
-      "/api/voucher-transactions/search",
-      payload,
-      "POST"
-    );
-
-    console.log("Response =>", response);
-
-    const result = response?.data || response;
-
-    setRows(
-      (result?.content || []).map((item, index) => ({
-        id: `${item.transactionId}-${index}`,
-        ...item,
-      }))
-    );
-
-    setRowCount(result?.totalElements || 0);
-  } catch (error) {
-    console.error(
-      "Date Wise Search Error =>",
-      error
-    );
-  } finally {
-    setLoading(false);
-  }
+  setShowTable(false);
 };
 
-
-
-
-
-const handleSearch = async (
-  page = paginationModel.page,
-  pageSize = paginationModel.pageSize
-) => {
-  if (!validate()) {
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const payload = {
-      acClassification: assetClassification,
-      fromDate: dayjs(fromDate).format("DD-MM-YYYY"),
-      toDate: dayjs(toDate).format("DD-MM-YYYY"),
-      pageNumber: page,
-      pageSize: pageSize,
-    };
-
-    console.log("Search Payload =>", payload);
-
-    const response = await callApi(
-      "/api/voucher-transactions/search",
-      payload,
-      "POST"
-    );
-
-    console.log(
-      "Search Response =>",
-      response
-    );
-
-    const result = response?.data?.data || {};
-
-    console.log(
-      "Content =>",
-      result?.content
-    );
-
-    setRows(
-      (result?.content || []).map(
-        (item, index) => ({
-          id: `${item.transactionId}-${index}`,
-          transactionId:
-            item.transactionId,
-          batchId: item.batchId,
-          journalId: item.journalId,
-          transactionDate:
-            item.transactionDate,
-          postDate: item.postDate,
-          cgl: item.cgl,
-          currency:
-            item.currency,
-          branchCode:
-            item.branchCode,
-        })
-      )
-    );
-
-    setRowCount(
-      result?.totalElements || 0
-    );
-  } catch (error) {
-    console.error(
-      "Date Wise Search Error =>",
-      error
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-<DataGrid
-  autoHeight
-  rows={rows}
-  columns={columns}
-  getRowId={(row) => row.id}
-  loading={loading}
-  rowCount={rowCount}
-  paginationMode="server"
-  paginationModel={paginationModel}
-  onPaginationModelChange={
-    handlePaginationChange
-  }
-  pageSizeOptions={[25, 50, 100]}
-  disableRowSelectionOnClick
-/>
-
-
-
-
-const assetClassificationOptions = [
-  { value: "A", label: "Asset" },
-  { value: "L", label: "Liability" },
-  { value: "I", label: "Income" },
-  { value: "E", label: "Expense" },
-  { value: "M", label: "Memo A/c" },
-];
-
-
-<TextField
-  select
-  fullWidth
-  label="Asset Classification"
-  value={assetClassification}
-  onChange={(e) =>
-    setAssetClassification(e.target.value)
-  }
->
-  {assetClassificationOptions.map((option) => (
-    <MenuItem
-      key={option.value}
-      value={option.value}
-    >
-      {option.label}
-    </MenuItem>
-  ))}
-</TextField>
+{showTable && (
+  <Paper elevation={2}>
+    <DataGrid
+      autoHeight
+      rows={rows}
+      columns={columns}
+      loading={loading}
+      rowCount={rowCount}
+      paginationMode="server"
+      paginationModel={paginationModel}
+      onPaginationModelChange={handlePaginationChange}
+      pageSizeOptions={[25, 50, 100]}
+      disableRowSelectionOnClick
+    />
+  </Paper>
+)}
