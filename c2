@@ -1,0 +1,195 @@
+const handleSearch = async (
+  page = paginationModel.page,
+  pageSize = paginationModel.pageSize
+) => {
+  console.log("SEARCH CLICKED");
+
+  if (!validate()) {
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      acClassification: assetClassification,
+      fromDate: dayjs(fromDate).format("DD-MM-YYYY"),
+      toDate: dayjs(toDate).format("DD-MM-YYYY"),
+      pageNumber: page,
+      pageSize: pageSize,
+    };
+
+    console.log("Payload =>", payload);
+
+    const response = await api.post(
+      "/api/voucher-transactions/search",
+      payload
+    );
+
+    console.log("Response =>", response);
+
+    const result = response?.data?.data || {};
+
+    setRows(
+      (result.content || []).map((item, index) => ({
+        id: item.transactionId || index,
+        ...item,
+      }))
+    );
+
+    setRowCount(result.totalElements || 0);
+  } catch (error) {
+    console.error(
+      "Date Wise Search Error",
+      error
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+return (
+  <LocalizationProvider
+    dateAdapter={AdapterDayjs}
+  >
+    <Box sx={{ p: 3 }}>
+      <Paper
+        elevation={2}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 2,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 3,
+            fontWeight: 600,
+          }}
+        >
+          Date Wise Search
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+          }}
+        >
+          <TextField
+            select
+            size="small"
+            label="Asset Classification"
+            value={assetClassification}
+            onChange={(e) =>
+              setAssetClassification(
+                e.target.value
+              )
+            }
+            sx={{ minWidth: 220 }}
+          >
+            {assetClassificationOptions.map(
+              (option) => (
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                >
+                  {option.label}
+                </MenuItem>
+              )
+            )}
+          </TextField>
+
+          <DatePicker
+            label="From Date *"
+            value={fromDate}
+            onChange={setFromDate}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                size: "small",
+                error:
+                  !!errors.fromDate,
+                helperText:
+                  errors.fromDate,
+              },
+            }}
+          />
+
+          <DatePicker
+            label="To Date *"
+            value={toDate}
+            onChange={setToDate}
+            format="DD-MM-YYYY"
+            slotProps={{
+              textField: {
+                size: "small",
+                error: !!errors.toDate,
+                helperText:
+                  errors.toDate,
+              },
+            }}
+          />
+
+          <Button
+            variant="contained"
+            onClick={() => {
+              console.log(
+                "SEARCH CLICKED"
+              );
+              handleSearch();
+            }}
+            sx={{
+              height: 40,
+              minWidth: 110,
+            }}
+          >
+            Search
+          </Button>
+
+          <Button
+            variant="outlined"
+            onClick={handleReset}
+            sx={{
+              height: 40,
+              minWidth: 110,
+            }}
+          >
+            Reset
+          </Button>
+        </Box>
+      </Paper>
+
+      <Paper elevation={2}>
+        <DataGrid
+          autoHeight
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          rowCount={rowCount}
+          paginationMode="server"
+          paginationModel={
+            paginationModel
+          }
+          onPaginationModelChange={
+            handlePaginationChange
+          }
+          pageSizeOptions={[
+            25,
+            50,
+            100,
+          ]}
+          disableRowSelectionOnClick
+          density="compact"
+          sx={{
+            border: 0,
+          }}
+        />
+      </Paper>
+    </Box>
+  </LocalizationProvider>
+);
