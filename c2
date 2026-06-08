@@ -79,3 +79,96 @@ const handleSearch = async (
     setLoading(false);
   }
 };
+
+
+
+
+
+const handleSearch = async (
+  page = paginationModel.page,
+  pageSize = paginationModel.pageSize
+) => {
+  if (!validate()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const payload = {
+      acClassification: assetClassification,
+      fromDate: dayjs(fromDate).format("DD-MM-YYYY"),
+      toDate: dayjs(toDate).format("DD-MM-YYYY"),
+      pageNumber: page,
+      pageSize: pageSize,
+    };
+
+    console.log("Search Payload =>", payload);
+
+    const response = await callApi(
+      "/api/voucher-transactions/search",
+      payload,
+      "POST"
+    );
+
+    console.log(
+      "Search Response =>",
+      response
+    );
+
+    const result = response?.data?.data || {};
+
+    console.log(
+      "Content =>",
+      result?.content
+    );
+
+    setRows(
+      (result?.content || []).map(
+        (item, index) => ({
+          id: `${item.transactionId}-${index}`,
+          transactionId:
+            item.transactionId,
+          batchId: item.batchId,
+          journalId: item.journalId,
+          transactionDate:
+            item.transactionDate,
+          postDate: item.postDate,
+          cgl: item.cgl,
+          currency:
+            item.currency,
+          branchCode:
+            item.branchCode,
+        })
+      )
+    );
+
+    setRowCount(
+      result?.totalElements || 0
+    );
+  } catch (error) {
+    console.error(
+      "Date Wise Search Error =>",
+      error
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+<DataGrid
+  autoHeight
+  rows={rows}
+  columns={columns}
+  getRowId={(row) => row.id}
+  loading={loading}
+  rowCount={rowCount}
+  paginationMode="server"
+  paginationModel={paginationModel}
+  onPaginationModelChange={
+    handlePaginationChange
+  }
+  pageSizeOptions={[25, 50, 100]}
+  disableRowSelectionOnClick
+/>
