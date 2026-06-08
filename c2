@@ -1,167 +1,98 @@
-const [showTable, setShowTable] = useState(false);
-
-setRows(
-  (data.content || []).map((item) => ({
-    id: item.transactionId,
-    ...item,
-  }))
-);
-
-setRowCount(data.totalElements || 0);
-
-// ADD THIS
-setShowTable(true);
-
-const handleReset = () => {
-  setAssetClassification("");
-  setFromDate(null);
-  setToDate(null);
-
-  setRows([]);
-  setRowCount(0);
-
-  setPaginationModel({
-    page: 0,
-    pageSize: 25,
-  });
-
-  setErrors({});
-
-  setShowTable(false);
-};
-
-{showTable && (
-  <Paper elevation={2}>
-    <DataGrid
-      autoHeight
-      rows={rows}
-      columns={columns}
-      loading={loading}
-      rowCount={rowCount}
-      paginationMode="server"
-      paginationModel={paginationModel}
-      onPaginationModelChange={handlePaginationChange}
-      pageSizeOptions={[25, 50, 100]}
-      disableRowSelectionOnClick
-    />
-  </Paper>
-)}
-
-
-
 
 <Paper
   elevation={2}
   sx={{
     p: 3,
-    mb: 3,
     borderRadius: 3,
   }}
 >
   <Typography
     variant="h6"
-    fontWeight={600}
-    mb={3}
+    sx={{ mb: 3, fontWeight: 600 }}
   >
     Date Wise Search
   </Typography>
 
-  <Grid
-    container
-    spacing={2}
-    alignItems="center"
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns:
+        "1.2fr 1fr 1fr auto auto",
+      gap: 2,
+      alignItems: "center",
+    }}
   >
-    <Grid item xs={12} md={3}>
-      <TextField
-        select
-        fullWidth
-        label="Asset Classification"
-        value={assetClassification}
-        onChange={(e) =>
-          setAssetClassification(
-            e.target.value
-          )
-        }
-      >
-        {assetClassificationOptions.map(
-          (option) => (
-            <MenuItem
-              key={option.value}
-              value={option.value}
-            >
-              {option.label}
-            </MenuItem>
-          )
-        )}
-      </TextField>
-    </Grid>
+    {/* Asset Classification */}
 
-    <Grid item xs={12} md={3}>
-      <DatePicker
-        label="From Date *"
-        value={fromDate}
-        onChange={setFromDate}
-        format="DD-MM-YYYY"
-        slotProps={{
-          textField: {
-            fullWidth: true,
-            error:
-              !!errors.fromDate,
-            helperText:
-              errors.fromDate,
-          },
-        }}
-      />
-    </Grid>
+    <TextField
+      select
+      fullWidth
+      label="Asset Classification"
+      value={assetClassification}
+      onChange={(e) =>
+        setAssetClassification(e.target.value)
+      }
+    >
+      {assetClassificationOptions.map(
+        (option) => (
+          <MenuItem
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </MenuItem>
+        )
+      )}
+    </TextField>
 
-    <Grid item xs={12} md={3}>
-      <DatePicker
-        label="To Date *"
-        value={toDate}
-        onChange={setToDate}
-        format="DD-MM-YYYY"
-        slotProps={{
-          textField: {
-            fullWidth: true,
-            error:
-              !!errors.toDate,
-            helperText:
-              errors.toDate,
-          },
-        }}
-      />
-    </Grid>
+    {/* From Date */}
 
-    <Grid item xs={12} md={3}>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={handleSearch}
-          sx={{
-            minWidth: 90,
-            height: 40,
-          }}
-        >
-          Search
-        </Button>
+    <DatePicker
+      label="From Date *"
+      value={fromDate}
+      onChange={setFromDate}
+      format="DD-MM-YYYY"
+      slotProps={{
+        textField: {
+          fullWidth: true,
+        },
+      }}
+    />
 
-        <Button
-          variant="outlined"
-          onClick={handleReset}
-          sx={{
-            minWidth: 90,
-            height: 40,
-          }}
-        >
-          Reset
-        </Button>
-      </Box>
-    </Grid>
-  </Grid>
+    {/* To Date */}
+
+    <DatePicker
+      label="To Date *"
+      value={toDate}
+      onChange={setToDate}
+      format="DD-MM-YYYY"
+      slotProps={{
+        textField: {
+          fullWidth: true,
+        },
+      }}
+    />
+
+    <Button
+      variant="contained"
+      onClick={handleSearch}
+      sx={{
+        minWidth: 90,
+        height: 40,
+      }}
+    >
+      Search
+    </Button>
+
+    <Button
+      variant="outlined"
+      onClick={handleReset}
+      sx={{
+        minWidth: 90,
+        height: 40,
+      }}
+    >
+      Reset
+    </Button>
+  </Box>
 </Paper>
