@@ -256,3 +256,17 @@ const validate = () => {
 
 
 maxDate={dayjs()}
+
+
+
+<Button
+  variant="contained"
+  onClick={() =>
+    handleSearch(
+      paginationModel.page,
+      paginationModel.pageSize
+    )
+  }
+>
+  Search
+</Button>
