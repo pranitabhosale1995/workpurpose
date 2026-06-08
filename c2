@@ -120,3 +120,94 @@
     </LocalizationProvider>
   );
 };
+
+
+
+
+<Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns:
+      "1.2fr 1fr 1fr auto auto",
+    gap: 2,
+    alignItems: "center",
+  }}
+>
+  <FormControl
+    fullWidth
+    size="small"
+  >
+    <InputLabel>
+      Classification
+    </InputLabel>
+
+    <Select
+      value={assetClassification}
+      label="Classification"
+      onChange={(e) =>
+        setAssetClassification(
+          e.target.value
+        )
+      }
+    >
+      {assetClassificationOptions.map(
+        (option) => (
+          <MenuItem
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </MenuItem>
+        )
+      )}
+    </Select>
+  </FormControl>
+
+  <DatePicker
+    label="From Date *"
+    value={fromDate}
+    onChange={setFromDate}
+    format="DD-MM-YYYY"
+    slotProps={{
+      textField: {
+        fullWidth: true,
+        size: "small",
+      },
+    }}
+  />
+
+  <DatePicker
+    label="To Date *"
+    value={toDate}
+    onChange={setToDate}
+    format="DD-MM-YYYY"
+    slotProps={{
+      textField: {
+        fullWidth: true,
+        size: "small",
+      },
+    }}
+  />
+
+  <Button
+    variant="contained"
+    onClick={handleSearch}
+    sx={{
+      minWidth: 95,
+      height: 40,
+    }}
+  >
+    Search
+  </Button>
+
+  <Button
+    variant="outlined"
+    onClick={handleReset}
+    sx={{
+      minWidth: 90,
+      height: 40,
+    }}
+  >
+    Reset
+  </Button>
+</Box>
