@@ -28,3 +28,54 @@ setRowCount(result?.totalElements || 0);
   getRowId={(row) =>
     `${row.transactionId}-${row.batchId}`
   }
+
+
+
+
+
+const handleSearch = async (
+  page = paginationModel.page,
+  pageSize = paginationModel.pageSize
+) => {
+  if (!validate()) return;
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      acClassification: assetClassification,
+      fromDate: dayjs(fromDate).format("DD-MM-YYYY"),
+      toDate: dayjs(toDate).format("DD-MM-YYYY"),
+      pageNumber: page,
+      pageSize: pageSize,
+    };
+
+    console.log("Payload =>", payload);
+
+    const response = await callApi(
+      "/api/voucher-transactions/search",
+      payload,
+      "POST"
+    );
+
+    console.log("Response =>", response);
+
+    const result = response?.data || response;
+
+    setRows(
+      (result?.content || []).map((item, index) => ({
+        id: `${item.transactionId}-${index}`,
+        ...item,
+      }))
+    );
+
+    setRowCount(result?.totalElements || 0);
+  } catch (error) {
+    console.error(
+      "Date Wise Search Error =>",
+      error
+    );
+  } finally {
+    setLoading(false);
+  }
+};
