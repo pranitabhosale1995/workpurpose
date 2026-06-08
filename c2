@@ -172,3 +172,34 @@ const handleSearch = async (
   pageSizeOptions={[25, 50, 100]}
   disableRowSelectionOnClick
 />
+
+
+
+
+const assetClassificationOptions = [
+  { value: "A", label: "Asset" },
+  { value: "L", label: "Liability" },
+  { value: "I", label: "Income" },
+  { value: "E", label: "Expense" },
+  { value: "M", label: "Memo A/c" },
+];
+
+
+<TextField
+  select
+  fullWidth
+  label="Asset Classification"
+  value={assetClassification}
+  onChange={(e) =>
+    setAssetClassification(e.target.value)
+  }
+>
+  {assetClassificationOptions.map((option) => (
+    <MenuItem
+      key={option.value}
+      value={option.value}
+    >
+      {option.label}
+    </MenuItem>
+  ))}
+</TextField>
