@@ -46,3 +46,122 @@ const handleReset = () => {
     />
   </Paper>
 )}
+
+
+
+
+<Paper
+  elevation={2}
+  sx={{
+    p: 3,
+    mb: 3,
+    borderRadius: 3,
+  }}
+>
+  <Typography
+    variant="h6"
+    fontWeight={600}
+    mb={3}
+  >
+    Date Wise Search
+  </Typography>
+
+  <Grid
+    container
+    spacing={2}
+    alignItems="center"
+  >
+    <Grid item xs={12} md={3}>
+      <TextField
+        select
+        fullWidth
+        label="Asset Classification"
+        value={assetClassification}
+        onChange={(e) =>
+          setAssetClassification(
+            e.target.value
+          )
+        }
+      >
+        {assetClassificationOptions.map(
+          (option) => (
+            <MenuItem
+              key={option.value}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          )
+        )}
+      </TextField>
+    </Grid>
+
+    <Grid item xs={12} md={3}>
+      <DatePicker
+        label="From Date *"
+        value={fromDate}
+        onChange={setFromDate}
+        format="DD-MM-YYYY"
+        slotProps={{
+          textField: {
+            fullWidth: true,
+            error:
+              !!errors.fromDate,
+            helperText:
+              errors.fromDate,
+          },
+        }}
+      />
+    </Grid>
+
+    <Grid item xs={12} md={3}>
+      <DatePicker
+        label="To Date *"
+        value={toDate}
+        onChange={setToDate}
+        format="DD-MM-YYYY"
+        slotProps={{
+          textField: {
+            fullWidth: true,
+            error:
+              !!errors.toDate,
+            helperText:
+              errors.toDate,
+          },
+        }}
+      />
+    </Grid>
+
+    <Grid item xs={12} md={3}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          alignItems: "center",
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={handleSearch}
+          sx={{
+            minWidth: 90,
+            height: 40,
+          }}
+        >
+          Search
+        </Button>
+
+        <Button
+          variant="outlined"
+          onClick={handleReset}
+          sx={{
+            minWidth: 90,
+            height: 40,
+          }}
+        >
+          Reset
+        </Button>
+      </Box>
+    </Grid>
+  </Grid>
+</Paper>
