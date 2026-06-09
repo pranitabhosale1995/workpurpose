@@ -5,3 +5,28 @@ vi.mock("../../hooks/useApi", () => ({
     callApi: vi.fn(),
   }),
 }));
+
+
+it("should render Classification dropdown", () => {
+  renderComponent();
+
+  expect(
+    screen.getByRole("combobox")
+  ).toBeInTheDocument();
+});
+
+it("should render From Date field", () => {
+  renderComponent();
+
+  expect(
+    screen.getByText(/from date/i)
+  ).toBeInTheDocument();
+});
+
+it("should render To Date field", () => {
+  renderComponent();
+
+  expect(
+    screen.getByText(/to date/i)
+  ).toBeInTheDocument();
+});
