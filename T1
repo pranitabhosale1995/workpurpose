@@ -1,133 +1,740 @@
-import { waitFor } from "@testing-library/react";
+import React, { useEffect, useState, useMemo } from "react";
+import {
+  Box, Paper, Typography, Button, TextField, Dialog,
+  DialogTitle, DialogContent, DialogActions, Snackbar,
+  Alert, Accordion, AccordionSummary, AccordionDetails,
+  FormControl, InputLabel, Select, MenuItem
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import BlockIcon from "@mui/icons-material/Block";
+import { DataGrid } from "@mui/x-data-grid";
+import useApi from "../../hooks/useApi";
 
-const mockCallApi = vi.fn();
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
-vi.mock("../../hooks/useApi", () => ({
-  default: () => ({
-    callApi: mockCallApi,
-  }),
-}));
+const ViewVoucherRequestsScreen = () => {
+  const { callApi } = useApi();
+
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [searchVID, setSearchVID] = useState("");
+
+  const [searchStatus, setSearchStatus] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+  const [expanded, setExpanded] = useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [deleteRemark, setDeleteRemark] = useState("");
+
+  const [descriptionPopupOpen, setDescriptionPopupOpen] =
+    useState(false);
+
+  const [selectedDescription, setSelectedDescription] =
+    useState("");
+
+  const [searchDate, setSearchDate] =
+    useState(null);
 
 
-describe("RequestVoucherScreen - API And Dialog Tests", () => {
-
-  it("should call APIs on component load", async () => {
-    mockCallApi.mockResolvedValue([]);
-
-    renderComponent();
-
-    await waitFor(() => {
-      expect(mockCallApi)
-        .toHaveBeenCalled();
-    });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
   });
+  const [remarkPopupOpen, setRemarkPopupOpen] =
+    useState(false);
 
-  it("should show success dialog after create api success", async () => {
-    mockCallApi
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce({
-        data: [],
-      })
-      .mockResolvedValueOnce({
-        vid: "VID12345",
+  const [selectedRemark, setSelectedRemark] =
+    useState("");
+
+
+  // ================
+
+  const [voucherCategories, setVoucherCategories] = useState([]);
+
+  const [voucherStatuses, setVoucherStatuses] = useState([]);
+
+  // ========
+  useEffect(() => {
+    fetchVoucherCategories();
+    fetchVoucherStatuses();
+    fetchVouchers();
+  }, []);
+
+
+  const handleViewDescription = (
+    description
+  ) => {
+    setSelectedDescription(
+      description || "-"
+    );
+
+    setDescriptionPopupOpen(
+      true
+    );
+  };
+
+  // 8888888888==============================================================
+
+  const handleViewRemark = (
+    remark
+  ) => {
+    setSelectedRemark(
+      remark || "-"
+    );
+
+    setRemarkPopupOpen(
+      true
+    );
+  };
+
+
+  const fetchVoucherCategories = async () => {
+    try {
+      const response = await callApi(
+        "/VE/voucher-transactions/voucher-categories",
+        null,
+        "GET"
+      );
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      setVoucherCategories(data);
+
+    } catch (error) {
+      console.error(error);
+      setVoucherCategories([]);
+    }
+  };
+
+  const fetchVoucherStatuses = async () => {
+    try {
+      const response = await callApi(
+        "/VE/voucher-transactions/voucher-statuses",
+        null,
+        "GET"
+      );
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      setVoucherStatuses(data);
+
+    } catch (error) {
+      console.error(error);
+      setVoucherStatuses([]);
+    }
+  };
+
+  // =====================================
+
+  const fetchVouchers = async () => {
+    setLoading(true);
+
+    try {
+
+      let url =
+        "/VE/voucher-transactions/search-vid";
+
+      const queryParams = [];
+
+      // Default table load
+      if (
+        !searchVID &&
+        !searchStatus &&
+        !searchDate &&
+        !searchCategory
+      ) {
+        queryParams.push(
+          "status=ACTIVE"
+        );
+      }
+
+      if (searchVID) {
+        queryParams.push(
+          `vid=${searchVID}`
+        );
+      }
+
+      if (searchStatus) {
+        queryParams.push(
+          `status=${searchStatus}`
+        );
+      }
+
+      if (searchDate) {
+        queryParams.push(
+          `date=${dayjs(
+            searchDate
+          ).format(
+            "YYYY-MM-DD"
+          )}`
+        );
+      }
+
+      if (searchCategory) {
+        queryParams.push(
+          `categoryId=${searchCategory}`
+        );
+      }
+
+      if (
+        queryParams.length > 0
+      ) {
+        url +=
+          "?" +
+          queryParams.join("&");
+      }
+
+      console.log(
+        "Table URL =>",
+        url
+      );
+
+      const response =
+        await callApi(
+          url,
+          null,
+          "GET"
+        );
+
+      const data =
+        Array.isArray(response)
+          ? response
+          : response?.data || [];
+
+      setRows(data);
+
+    } catch (error) {
+
+      console.error(
+        "Fetch Error =>",
+        error
+      );
+
+      setSnackbar({
+        open: true,
+        message:
+          "Failed to fetch vouchers",
+        severity: "error",
       });
 
-    renderComponent();
+    } finally {
 
-    fireEvent.change(
-      screen.getByLabelText(
-        /description/i
-      ),
+      setLoading(false);
+
+    }
+  };
+  const handleReset = async () => {
+    setSearchVID("");
+    setSearchStatus("");
+    setSearchCategory("");
+    setSearchDate(null);
+
+    setLoading(true);
+
+    try {
+      const response = await callApi(
+        "/VE/voucher-transactions/search-vid?status=ACTIVE",
+        null,
+        "GET"
+      );
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      setRows(data);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (row) => {
+    setSelectedRow(row);
+    setDeleteRemark("");
+    setDeleteDialogOpen(true);
+  };
+
+  const handleTerminate = async () => {
+    try {
+      const payload = {
+        id: selectedRow?.id,
+        terminatedBy: sessionStorage.getItem("userId"),
+        remarks: deleteRemark,
+      };
+
+      await callApi(
+        "/VE/voucher-transactions/terminate-vid",
+        payload,
+        "POST"
+      );
+
+      setDeleteDialogOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: "Voucher terminated successfully",
+        severity: "success",
+      });
+
+      fetchVouchers();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Terminate failed",
+        severity: "error",
+      });
+    }
+  };
+
+  // const columns = useMemo(() => [
+  //   { field: "vid", headerName: "VID", flex: 1 },
+  //   { field: "categoryName", headerName: "Category", flex: 1 },
+  //   { field: "allowedRoleName", headerName: "Role", flex: 1 },
+  //   { field: "categoryName", headerName: "Category", flex: 1 },
+
+  //   { field: "status", headerName: "Status", flex: 1 },
+  //   {
+  //     field: "createdAt",
+  //     headerName: "Created At",
+  //     flex: 1.5,
+  //     renderCell: (params) =>
+  //       params.value
+  //         ? new Date(params.value).toLocaleString()
+  //         : "",
+  //   },
+  //   {
+  //     field: "description",
+  //     headerName: "Description",
+  //     flex: 1,
+
+  //     renderCell: (params) => (
+  //       <Button
+  //         variant="text"
+  //         onClick={() =>
+  //           handleViewDescription(
+  //             params.row.description
+  //           )
+  //         }
+  //       >
+  //         View
+  //       </Button>
+  //     ),
+  //   },
+  //   {
+  //     field: "remarks",
+  //     headerName: "Remark",
+  //     flex: 1,
+
+  //     renderCell: (params) => {
+
+  //       if (
+  //         params.row.status !==
+  //         "TERMINATED"
+  //       ) {
+  //         return "-";
+  //       }
+
+  //       return (
+  //         <Button
+  //           variant="text"
+  //           onClick={() =>
+  //             handleViewRemark(
+  //               params.row.remarks
+  //             )
+  //           }
+  //         >
+  //           View
+  //         </Button>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     field: "action",
+  //     headerName: "Action",
+  //     flex: 1,
+  //     renderCell: (params) =>
+  //       params.row.status === "ACTIVE" ? (
+  //         <Button
+  //           color="error"
+  //           variant="contained"
+  //           startIcon={<BlockIcon />}
+  //           onClick={() => handleDeleteClick(params.row)}
+  //         >
+  //           Terminate
+  //         </Button>
+  //       ) : null,
+  //   },
+  // ], []);
+
+  const columns = useMemo(() => {
+    const cols = [
+      { field: "vid", headerName: "VID", flex: 1 },
+
       {
-        target: {
-          value:
-            "Test Description",
-        },
-      }
-    );
+        field: "categoryName",
+        headerName: "Category",
+        flex: 1,
+      },
 
-    fireEvent.click(
-      screen.getByRole(
-        "button",
-        {
-          name: /create/i,
+      {
+        field: "allowedRoleName",
+        headerName: "Role",
+        flex: 1,
+      },
+
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 1,
+      },
+
+      {
+        field: "createdAt",
+        headerName: "Created At",
+        flex: 1.5,
+        renderCell: (params) =>
+          params.value
+            ? new Date(
+              params.value
+            ).toLocaleString()
+            : "",
+      },
+
+      {
+        field: "description",
+        headerName: "Description",
+        flex: 1,
+        renderCell: (params) => (
+          <Button
+            variant="text"
+            onClick={() =>
+              handleViewDescription(
+                params.row.description
+              )
+            }
+          >
+            View
+          </Button>
+        ),
+      },
+    ];
+
+    if (searchStatus === "TERMINATED") {
+      cols.push({
+        field: "remarks",
+        headerName: "Remark",
+        flex: 1,
+
+        renderCell: (params) => (
+          <Button
+            variant="text"
+            onClick={() =>
+              handleViewRemark(
+                params.row.remarks
+              )
+            }
+          >
+            View
+          </Button>
+        ),
+      });
+    }
+
+    cols.push({
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+
+      renderCell: (params) =>
+        params.row.status ===
+          "ACTIVE" ? (
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<BlockIcon />}
+            onClick={() =>
+              handleDeleteClick(
+                params.row
+              )
+            }
+          >
+            Terminate
+          </Button>
+        ) : null,
+    });
+
+    return cols;
+  }, [searchStatus]);
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" mb={2}>
+          View Voucher Requests
+        </Typography>
+
+        <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Search Filters</Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <Box sx={{
+              display: "grid",
+              gridTemplateColumns:
+        "1.2fr 1.2fr 1.1fr 1.1fr auto auto",
+              gap: 2
+            }}>
+
+              <TextField
+                label="VID"
+                size="small"
+                value={searchVID}
+                onChange={(e) => setSearchVID(e.target.value)}
+              />
+
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+              >
+                <DatePicker
+                  disableFuture
+                  label="Date"
+                  value={searchDate}
+                  onChange={(newValue) =>
+                    setSearchDate(newValue)
+                  }
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      fullWidth: true,
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+
+              <FormControl size="small">
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={searchStatus}
+                  onChange={(e) =>
+                    setSearchStatus(e.target.value)
+                  }
+                >
+
+
+                  {voucherStatuses.map((item, index) => (
+                    <MenuItem
+                      key={index}
+                      value={item.value}
+                    >
+                      {item.value}
+                    </MenuItem>
+                  ))}
+
+                </Select>
+
+              </FormControl>
+
+              <FormControl size="small">
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={searchCategory}
+                  onChange={(e) =>
+                    setSearchCategory(e.target.value)
+                  }
+                >
+
+
+                  {voucherCategories.map((item) => (
+                    <MenuItem
+                      key={item.id}
+                      value={item.id}
+                    >
+                      {item.categoryName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Button variant="contained" onClick={fetchVouchers}>
+                Search
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+
+        <Box sx={{ height: 550, mt: 2 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            loading={loading}
+          />
+        </Box>
+      </Paper>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() =>
+          setDeleteDialogOpen(false)
         }
-      )
-    );
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          Terminate Voucher
+        </DialogTitle>
 
-    await waitFor(() => {
-      expect(
-        mockCallApi
-      ).toHaveBeenCalled();
-    });
-  });
+        <DialogContent>
 
-  it("should show error snackbar when api fails", async () => {
-    mockCallApi.mockRejectedValue(
-      new Error("API Error")
-    );
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Remark *"
+            value={deleteRemark}
+            onChange={(e) =>
+              setDeleteRemark(
+                e.target.value
+              )
+            }
+          />
 
-    renderComponent();
+        </DialogContent>
 
-    await waitFor(() => {
-      expect(
-        mockCallApi
-      ).toHaveBeenCalled();
-    });
-  });
+        <DialogActions>
 
-});
+          <Button
+            onClick={() =>
+              setDeleteDialogOpen(false)
+            }
+          >
+            Cancel
+          </Button>
 
+          <Button
+            color="error"
+            variant="contained"
+            disabled={
+              !deleteRemark.trim()
+            }
+            onClick={
+              handleTerminate
+            }
+          >
+            Terminate
+          </Button>
 
+        </DialogActions>
 
+      </Dialog>
 
-describe("RequestVoucherScreen - Advanced UI Tests", () => {
+      <Dialog
+        open={descriptionPopupOpen}
+        onClose={() =>
+          setDescriptionPopupOpen(
+            false
+          )
+        }
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          Description
+        </DialogTitle>
 
-  it("should keep create button visible", () => {
-    renderComponent();
+        <DialogContent>
 
-    expect(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    ).toBeVisible();
-  });
+          <Typography>
+            {selectedDescription}
+          </Typography>
 
-  it("should keep reset button visible", () => {
-    renderComponent();
+        </DialogContent>
 
-    expect(
-      screen.getByRole("button", {
-        name: /reset/i,
-      })
-    ).toBeVisible();
-  });
+        <DialogActions>
 
-  it("should render two comboboxes", () => {
-    renderComponent();
+          <Button
+            onClick={() =>
+              setDescriptionPopupOpen(
+                false
+              )
+            }
+          >
+            Close
+          </Button>
 
-    expect(
-      screen.getAllByRole("combobox")
-        .length
-    ).toBe(2);
-  });
+        </DialogActions>
 
-  it("should render description helper counter", () => {
-    renderComponent();
+      </Dialog>
+      <Dialog
+        open={remarkPopupOpen}
+        onClose={() =>
+          setRemarkPopupOpen(false)
+        }
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          Termination Remark
+        </DialogTitle>
 
-    expect(
-      screen.getByText("0/500")
-    ).toBeInTheDocument();
-  });
+        <DialogContent>
 
-  it("should render sd helper text", () => {
-    renderComponent();
+          <Typography>
+            {selectedRemark}
+          </Typography>
 
-    expect(
-      screen.getByText(
-        /only numbers and commas allowed/i
-      )
-    ).toBeInTheDocument();
-  });
+        </DialogContent>
 
-});
+        <DialogActions>
+
+          <Button
+            onClick={() =>
+              setRemarkPopupOpen(false)
+            }
+          >
+            Close
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() =>
+          setSnackbar({
+            ...snackbar,
+            open: false,
+          })
+        }
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
+
+export default ViewVoucherRequestsScreen;
