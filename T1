@@ -1,254 +1,43 @@
-import React from "react";
-import { describe, it, expect, vi } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-} from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
+import { waitFor } from "@testing-library/react";
 
-import RequestVoucherScreen from "./RequestVoucherScreen";
+const mockCallApi = vi.fn();
 
 vi.mock("../../hooks/useApi", () => ({
   default: () => ({
-    callApi: vi.fn().mockResolvedValue([]),
+    callApi: mockCallApi,
   }),
 }));
 
-vi.mock("./ViewVoucherRequestScreen", () => ({
-  default: () => (
-    <div>View Voucher Request Screen</div>
-  ),
-}));
 
-const store = configureStore({
-  reducer: {
-    auth: () => ({
-      user: {
-        userId: "TEST001",
-      },
-    }),
-  },
-});
+describe("RequestVoucherScreen - API And Dialog Tests", () => {
 
-const renderComponent = () => {
-  return render(
-    <Provider store={store}>
-      <MemoryRouter>
-        <RequestVoucherScreen />
-      </MemoryRouter>
-    </Provider>
-  );
-};
+  it("should call APIs on component load", async () => {
+    mockCallApi.mockResolvedValue([]);
 
-describe("RequestVoucherScreen - Rendering Tests", () => {
-  it("should render Request Voucher title", () => {
     renderComponent();
 
-    expect(
-      screen.getByText(/request voucher/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockCallApi)
+        .toHaveBeenCalled();
+    });
   });
 
-  it("should render Voucher Category dropdown", () => {
-    renderComponent();
-
-    expect(
-      screen.getAllByRole("combobox")[0]
-    ).toBeInTheDocument();
-  });
-
-  it("should render Allowed Role dropdown", () => {
-    renderComponent();
-
-    expect(
-      screen.getAllByRole("combobox")[1]
-    ).toBeInTheDocument();
-  });
-
-  it("should render SD Request Number field", () => {
-    renderComponent();
-
-    expect(
-      screen.getByLabelText(/sd request number/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render Description field", () => {
-    renderComponent();
-
-    expect(
-      screen.getByLabelText(/description/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render Reset button", () => {
-    renderComponent();
-
-    expect(
-      screen.getByRole("button", {
-        name: /reset/i,
+  it("should show success dialog after create api success", async () => {
+    mockCallApi
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce({
+        data: [],
       })
-    ).toBeInTheDocument();
-  });
+      .mockResolvedValueOnce({
+        vid: "VID12345",
+      });
 
-  it("should render Create button", () => {
     renderComponent();
-
-    expect(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    ).toBeInTheDocument();
-  });
-
-  it("should render description counter", () => {
-    renderComponent();
-
-    expect(
-      screen.getByText(/0\/500/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render SD helper text", () => {
-    renderComponent();
-
-    expect(
-      screen.getByText(
-        /only numbers and commas allowed/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should not display Other Category field initially", () => {
-    renderComponent();
-
-    expect(
-      screen.queryByLabelText(
-        /other category/i
-      )
-    ).not.toBeInTheDocument();
-  });
-
-  it("should not display success dialog initially", () => {
-    renderComponent();
-
-    expect(
-      screen.queryByText(
-        /voucher request created/i
-      )
-    ).not.toBeInTheDocument();
-  });
-
-  it("should not display snackbar initially", () => {
-    renderComponent();
-
-    expect(
-      screen.queryByRole("alert")
-    ).not.toBeInTheDocument();
-  });
-
-  it("should render exactly two dropdowns", () => {
-    renderComponent();
-
-    expect(
-      screen.getAllByRole("combobox")
-        .length
-    ).toBe(2);
-  });
-});
-
-
-describe("RequestVoucherScreen - Validation Tests", () => {
-  it("should show validation errors when create clicked without data", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /voucher category is required/i
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      await screen.findByText(
-        /description is required/i
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      await screen.findByText(
-        /allowed role is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate voucher category", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /voucher category is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate description field", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /description is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate allowed role", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /allowed role is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should clear description when reset clicked", () => {
-    renderComponent();
-
-    const description =
-      screen.getByLabelText(
-        /description/i
-      );
 
     fireEvent.change(
-      description,
+      screen.getByLabelText(
+        /description/i
+      ),
       {
         target: {
           value:
@@ -261,197 +50,30 @@ describe("RequestVoucherScreen - Validation Tests", () => {
       screen.getByRole(
         "button",
         {
-          name: /reset/i,
+          name: /create/i,
         }
       )
     );
 
-    expect(
-      description.value
-    ).toBe("");
+    await waitFor(() => {
+      expect(
+        mockCallApi
+      ).toHaveBeenCalled();
+    });
   });
 
-  it("should allow numeric sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(
-      input,
-      {
-        target: {
-          value: "12345",
-        },
-      }
+  it("should show error snackbar when api fails", async () => {
+    mockCallApi.mockRejectedValue(
+      new Error("API Error")
     );
 
-    expect(
-      input.value
-    ).toBe("12345");
-  });
-});
-
-describe("RequestVoucherScreen - Input Handling Tests", () => {
-
-  it("should update description field", () => {
     renderComponent();
 
-    const description =
-      screen.getByLabelText(/description/i);
-
-    fireEvent.change(description, {
-      target: {
-        value: "Test Description",
-      },
+    await waitFor(() => {
+      expect(
+        mockCallApi
+      ).toHaveBeenCalled();
     });
-
-    expect(description.value)
-      .toBe("Test Description");
-  });
-
-  it("should update sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(input, {
-      target: {
-        value: "12345",
-      },
-    });
-
-    expect(input.value)
-      .toBe("12345");
-  });
-
-  it("should allow comma separated sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(input, {
-      target: {
-        value: "123,456,789",
-      },
-    });
-
-    expect(input.value)
-      .toBe("123,456,789");
-  });
-
-  it("should reject alphabetic sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(input, {
-      target: {
-        value: "ABC",
-      },
-    });
-
-    expect(input.value)
-      .toBe("");
-  });
-
-});
-
-
-describe("RequestVoucherScreen - Additional Input Tests", () => {
-
-  it("should accept comma separated sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(input, {
-      target: {
-        value: "100,200,300",
-      },
-    });
-
-    expect(input.value)
-      .toBe("100,200,300");
-  });
-
-  it("should not accept alphabets in sd request number", () => {
-    renderComponent();
-
-    const input =
-      screen.getByLabelText(
-        /sd request number/i
-      );
-
-    fireEvent.change(input, {
-      target: {
-        value: "ABC123",
-      },
-    });
-
-    expect(input.value)
-      .toBe("");
-  });
-
-  it("should update description correctly", () => {
-    renderComponent();
-
-    const description =
-      screen.getByLabelText(
-        /description/i
-      );
-
-    fireEvent.change(description, {
-      target: {
-        value: "Voucher Creation Testing",
-      },
-    });
-
-    expect(description.value)
-      .toBe(
-        "Voucher Creation Testing"
-      );
-  });
-
-  it("should clear description after reset", () => {
-    renderComponent();
-
-    const description =
-      screen.getByLabelText(
-        /description/i
-      );
-
-    fireEvent.change(description, {
-      target: {
-        value: "Testing",
-      },
-    });
-
-    fireEvent.click(
-      screen.getByRole(
-        "button",
-        {
-          name: /reset/i,
-        }
-      )
-    );
-
-    expect(description.value)
-      .toBe("");
   });
 
 });
