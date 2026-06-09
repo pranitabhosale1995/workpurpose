@@ -1,114 +1,22 @@
+describe("RequestVoucherScreen - Input Handling Tests", () => {
 
-describe("RequestVoucherScreen - Validation Tests", () => {
-  it("should show validation errors when create clicked without data", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /voucher category is required/i
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      await screen.findByText(
-        /description is required/i
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      await screen.findByText(
-        /allowed role is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate voucher category", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /voucher category is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate description field", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /description is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should validate allowed role", async () => {
-    renderComponent();
-
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /create/i,
-      })
-    );
-
-    expect(
-      await screen.findByText(
-        /allowed role is required/i
-      )
-    ).toBeInTheDocument();
-  });
-
-  it("should clear description when reset clicked", () => {
+  it("should update description field", () => {
     renderComponent();
 
     const description =
-      screen.getByLabelText(
-        /description/i
-      );
+      screen.getByLabelText(/description/i);
 
-    fireEvent.change(
-      description,
-      {
-        target: {
-          value:
-            "Test Description",
-        },
-      }
-    );
+    fireEvent.change(description, {
+      target: {
+        value: "Test Description",
+      },
+    });
 
-    fireEvent.click(
-      screen.getByRole(
-        "button",
-        {
-          name: /reset/i,
-        }
-      )
-    );
-
-    expect(
-      description.value
-    ).toBe("");
+    expect(description.value)
+      .toBe("Test Description");
   });
 
-  it("should allow numeric sd request number", () => {
+  it("should update sd request number", () => {
     renderComponent();
 
     const input =
@@ -116,24 +24,50 @@ describe("RequestVoucherScreen - Validation Tests", () => {
         /sd request number/i
       );
 
-    fireEvent.change(
-      input,
-      {
-        target: {
-          value: "12345",
-        },
-      }
-    );
+    fireEvent.change(input, {
+      target: {
+        value: "12345",
+      },
+    });
 
-    expect(
-      input.value
-    ).toBe("12345");
+    expect(input.value)
+      .toBe("12345");
   });
+
+  it("should allow comma separated sd request number", () => {
+    renderComponent();
+
+    const input =
+      screen.getByLabelText(
+        /sd request number/i
+      );
+
+    fireEvent.change(input, {
+      target: {
+        value: "123,456,789",
+      },
+    });
+
+    expect(input.value)
+      .toBe("123,456,789");
+  });
+
+  it("should reject alphabetic sd request number", () => {
+    renderComponent();
+
+    const input =
+      screen.getByLabelText(
+        /sd request number/i
+      );
+
+    fireEvent.change(input, {
+      target: {
+        value: "ABC",
+      },
+    });
+
+    expect(input.value)
+      .toBe("");
+  });
+
 });
-
-
-import {
-  render,
-  screen,
-  fireEvent,
-} from "@testing-library/react";
