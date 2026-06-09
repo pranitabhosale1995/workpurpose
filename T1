@@ -30,3 +30,23 @@ it("should render To Date field", () => {
     screen.getByText(/to date/i)
   ).toBeInTheDocument();
 });
+
+
+
+it("should render From Date field", () => {
+  renderComponent();
+
+  const labels =
+    screen.getAllByText(/from date/i);
+
+  expect(labels[0]).toBeInTheDocument();
+});
+
+it("should render To Date field", () => {
+  renderComponent();
+
+  const labels =
+    screen.getAllByText(/to date/i);
+
+  expect(labels[0]).toBeInTheDocument();
+});
