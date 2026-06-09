@@ -1,192 +1,139 @@
-import React from "react";
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
 
-import RequestVoucherScreen from "./RequestVoucherScreen";
-
-vi.mock("../../hooks/useApi", () => ({
-  default: () => ({
-    callApi: vi.fn().mockResolvedValue([]),
-  }),
-}));
-
-vi.mock("./ViewVoucherRequestScreen", () => ({
-  default: () => (
-    <div>View Voucher Request Screen</div>
-  ),
-}));
-
-const store = configureStore({
-  reducer: {
-    auth: () => ({
-      user: {
-        userId: "TEST001",
-      },
-    }),
-  },
-});
-
-const renderComponent = () => {
-  return render(
-    <Provider store={store}>
-      <MemoryRouter>
-        <RequestVoucherScreen />
-      </MemoryRouter>
-    </Provider>
-  );
-};
-
-describe("RequestVoucherScreen - Rendering Tests", () => {
-  it("should render Request Voucher title", () => {
+describe("RequestVoucherScreen - Validation Tests", () => {
+  it("should show validation errors when create clicked without data", async () => {
     renderComponent();
 
-    expect(
-      screen.getByText(/request voucher/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render Voucher Category dropdown", () => {
-    renderComponent();
-
-    expect(
-      screen.getAllByRole("combobox")[0]
-    ).toBeInTheDocument();
-  });
-
-  it("should render Allowed Role dropdown", () => {
-    renderComponent();
-
-    expect(
-      screen.getAllByRole("combobox")[1]
-    ).toBeInTheDocument();
-  });
-
-  it("should render SD Request Number field", () => {
-    renderComponent();
-
-    expect(
-      screen.getByLabelText(/sd request number/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render Description field", () => {
-    renderComponent();
-
-    expect(
-      screen.getByLabelText(/description/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render Reset button", () => {
-    renderComponent();
-
-    expect(
-      screen.getByRole("button", {
-        name: /reset/i,
-      })
-    ).toBeInTheDocument();
-  });
-
-  it("should render Create button", () => {
-    renderComponent();
-
-    expect(
+    fireEvent.click(
       screen.getByRole("button", {
         name: /create/i,
       })
-    ).toBeInTheDocument();
-  });
-
-  it("should render Select Category option", () => {
-    renderComponent();
+    );
 
     expect(
-      screen.getByText(/select category/i)
+      await screen.findByText(
+        /voucher category is required/i
+      )
     ).toBeInTheDocument();
-  });
-
-  it("should render Select Role option", () => {
-    renderComponent();
 
     expect(
-      screen.getByText(/select role/i)
+      await screen.findByText(
+        /description is required/i
+      )
     ).toBeInTheDocument();
-  });
-
-  it("should render description counter", () => {
-    renderComponent();
 
     expect(
-      screen.getByText(/0\/500/i)
-    ).toBeInTheDocument();
-  });
-
-  it("should render SD helper text", () => {
-    renderComponent();
-
-    expect(
-      screen.getByText(
-        /only numbers and commas allowed/i
+      await screen.findByText(
+        /allowed role is required/i
       )
     ).toBeInTheDocument();
   });
 
-  it("should not display Other Category field initially", () => {
+  it("should validate voucher category", async () => {
     renderComponent();
 
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /create/i,
+      })
+    );
+
     expect(
-      screen.queryByLabelText(
-        /other category/i
+      await screen.findByText(
+        /voucher category is required/i
       )
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
-  it("should not display success dialog initially", () => {
+  it("should validate description field", async () => {
     renderComponent();
 
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /create/i,
+      })
+    );
+
     expect(
-      screen.queryByText(
-        /voucher request created/i
+      await screen.findByText(
+        /description is required/i
       )
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
-  it("should not display snackbar initially", () => {
+  it("should validate allowed role", async () => {
     renderComponent();
 
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /create/i,
+      })
+    );
+
     expect(
-      screen.queryByRole("alert")
-    ).not.toBeInTheDocument();
+      await screen.findByText(
+        /allowed role is required/i
+      )
+    ).toBeInTheDocument();
   });
 
-  it("should render exactly two dropdowns", () => {
+  it("should clear description when reset clicked", () => {
     renderComponent();
 
+    const description =
+      screen.getByLabelText(
+        /description/i
+      );
+
+    fireEvent.change(
+      description,
+      {
+        target: {
+          value:
+            "Test Description",
+        },
+      }
+    );
+
+    fireEvent.click(
+      screen.getByRole(
+        "button",
+        {
+          name: /reset/i,
+        }
+      )
+    );
+
     expect(
-      screen.getAllByRole("combobox")
-        .length
-    ).toBe(2);
+      description.value
+    ).toBe("");
+  });
+
+  it("should allow numeric sd request number", () => {
+    renderComponent();
+
+    const input =
+      screen.getByLabelText(
+        /sd request number/i
+      );
+
+    fireEvent.change(
+      input,
+      {
+        target: {
+          value: "12345",
+        },
+      }
+    );
+
+    expect(
+      input.value
+    ).toBe("12345");
   });
 });
 
 
-
-it("should render Voucher Category label", () => {
-  renderComponent();
-
-  expect(
-    screen.getByText(/voucher category/i)
-  ).toBeInTheDocument();
-});
-
-it("should render Allowed Role label", () => {
-  renderComponent();
-
-  expect(
-    screen.getByText(/allowed role/i)
-  ).toBeInTheDocument();
-});
+import {
+  render,
+  screen,
+  fireEvent,
+} from "@testing-library/react";
