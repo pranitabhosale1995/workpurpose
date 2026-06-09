@@ -367,3 +367,91 @@ describe("RequestVoucherScreen - Input Handling Tests", () => {
   });
 
 });
+
+
+describe("RequestVoucherScreen - Additional Input Tests", () => {
+
+  it("should accept comma separated sd request number", () => {
+    renderComponent();
+
+    const input =
+      screen.getByLabelText(
+        /sd request number/i
+      );
+
+    fireEvent.change(input, {
+      target: {
+        value: "100,200,300",
+      },
+    });
+
+    expect(input.value)
+      .toBe("100,200,300");
+  });
+
+  it("should not accept alphabets in sd request number", () => {
+    renderComponent();
+
+    const input =
+      screen.getByLabelText(
+        /sd request number/i
+      );
+
+    fireEvent.change(input, {
+      target: {
+        value: "ABC123",
+      },
+    });
+
+    expect(input.value)
+      .toBe("");
+  });
+
+  it("should update description correctly", () => {
+    renderComponent();
+
+    const description =
+      screen.getByLabelText(
+        /description/i
+      );
+
+    fireEvent.change(description, {
+      target: {
+        value: "Voucher Creation Testing",
+      },
+    });
+
+    expect(description.value)
+      .toBe(
+        "Voucher Creation Testing"
+      );
+  });
+
+  it("should clear description after reset", () => {
+    renderComponent();
+
+    const description =
+      screen.getByLabelText(
+        /description/i
+      );
+
+    fireEvent.change(description, {
+      target: {
+        value: "Testing",
+      },
+    });
+
+    fireEvent.click(
+      screen.getByRole(
+        "button",
+        {
+          name: /reset/i,
+        }
+      )
+    );
+
+    expect(description.value)
+      .toBe("");
+  });
+
+});
