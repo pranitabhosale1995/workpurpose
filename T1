@@ -172,3 +172,21 @@ describe("RequestVoucherScreen - Rendering Tests", () => {
     ).toBe(2);
   });
 });
+
+
+
+it("should render Voucher Category label", () => {
+  renderComponent();
+
+  expect(
+    screen.getByText(/voucher category/i)
+  ).toBeInTheDocument();
+});
+
+it("should render Allowed Role label", () => {
+  renderComponent();
+
+  expect(
+    screen.getByText(/allowed role/i)
+  ).toBeInTheDocument();
+});
