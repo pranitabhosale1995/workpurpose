@@ -1,0 +1,70 @@
+import React from "react";
+import {
+  render,
+  screen,
+} from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+import DateWiseSearch from "./DateWiseSearch";
+
+describe("DateWiseSearch Component", () => {
+  test("should render Date Wise Search title", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByText(/date wise search/i)
+    ).toBeInTheDocument();
+  });
+
+  test("should render Classification dropdown", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByLabelText(/classification/i)
+    ).toBeInTheDocument();
+  });
+
+  test("should render From Date field", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByLabelText(/from date/i)
+    ).toBeInTheDocument();
+  });
+
+  test("should render To Date field", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByLabelText(/to date/i)
+    ).toBeInTheDocument();
+  });
+
+  test("should render Search button", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByRole("button", {
+        name: /search/i,
+      })
+    ).toBeInTheDocument();
+  });
+
+  test("should render Reset button", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.getByRole("button", {
+        name: /reset/i,
+      })
+    ).toBeInTheDocument();
+  });
+
+  test("should not display result table initially", () => {
+    render(<DateWiseSearch />);
+
+    expect(
+      screen.queryByRole("grid")
+    ).not.toBeInTheDocument();
+  });
+});
