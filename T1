@@ -77,3 +77,57 @@ describe("RequestVoucherScreen - API And Dialog Tests", () => {
   });
 
 });
+
+
+
+
+describe("RequestVoucherScreen - Advanced UI Tests", () => {
+
+  it("should keep create button visible", () => {
+    renderComponent();
+
+    expect(
+      screen.getByRole("button", {
+        name: /create/i,
+      })
+    ).toBeVisible();
+  });
+
+  it("should keep reset button visible", () => {
+    renderComponent();
+
+    expect(
+      screen.getByRole("button", {
+        name: /reset/i,
+      })
+    ).toBeVisible();
+  });
+
+  it("should render two comboboxes", () => {
+    renderComponent();
+
+    expect(
+      screen.getAllByRole("combobox")
+        .length
+    ).toBe(2);
+  });
+
+  it("should render description helper counter", () => {
+    renderComponent();
+
+    expect(
+      screen.getByText("0/500")
+    ).toBeInTheDocument();
+  });
+
+  it("should render sd helper text", () => {
+    renderComponent();
+
+    expect(
+      screen.getByText(
+        /only numbers and commas allowed/i
+      )
+    ).toBeInTheDocument();
+  });
+
+});
