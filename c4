@@ -1,0 +1,62 @@
+setCustomIssues([]);
+setCustomIssueInput("");
+setShowCustomIssue(false);
+
+
+
+onOpen={() => {
+
+  if (!formData.categoryId) {
+
+    setErrors((prev) => ({
+      ...prev,
+      issues:
+        "Please select Voucher Category first",
+    }));
+
+    return;
+  }
+
+  setIssueOpen(true);
+}}
+
+
+{errors.issues && (
+  <FormHelperText error>
+    {errors.issues}
+  </FormHelperText>
+)}
+
+
+
+options={[
+  ...issueList,
+
+  ...(formData.categoryId
+    ? [
+        {
+          id: "ADD_NEW",
+          issueCategoryName:
+            "+ Add Issue",
+        },
+      ]
+    : []),
+]}
+
+
+customIssueCategories:
+  customIssues.filter(
+    (item) => item?.trim()
+  ),
+
+
+
+if (
+  selectedIssues.length === 0 &&
+  customIssues.filter(
+    (item) => item?.trim()
+  ).length === 0
+) {
+  newErrors.issues =
+    "At least one issue is required";
+}
