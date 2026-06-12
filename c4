@@ -60,3 +60,27 @@ if (
   newErrors.issues =
     "At least one issue is required";
 }
+
+
+
+
+onOpen={() => {
+
+  if (!formData.categoryId) {
+
+    setErrors((prev) => ({
+      ...prev,
+      issues:
+        "Please select Voucher Category first",
+    }));
+
+    return;
+  }
+
+  setErrors((prev) => ({
+    ...prev,
+    issues: "",
+  }));
+
+  setIssueOpen(true);
+}}
