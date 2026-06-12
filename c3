@@ -20,3 +20,37 @@ if (name === "categoryId") {
   setSelectedIssues([]);
   setCustomIssues([""]);
 }
+
+
+
+<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+  <Autocomplete
+    multiple
+    options={issueList}
+    value={selectedIssues}
+    onChange={(event, newValue) =>
+      setSelectedIssues(newValue)
+    }
+    disableCloseOnSelect
+    getOptionLabel={(option) =>
+      option.issueName || ""
+    }
+    renderOption={(props, option, { selected }) => (
+      <li {...props}>
+        <Checkbox
+          checked={selected}
+          size="small"
+        />
+        {option.issueName}
+      </li>
+    )}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Issues *"
+      />
+    )}
+  />
+
+</Box>
