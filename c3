@@ -76,3 +76,14 @@ console.log(
   "Issues =>",
   selectedCategory?.issueCategories
 );
+
+
+
+
+issueCategoryIds: selectedIssues.map(
+  (item) => item.id
+),
+
+customIssueCategories: customIssues.filter(
+  (item) => item.trim() !== ""
+),
