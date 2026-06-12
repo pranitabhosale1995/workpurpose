@@ -127,3 +127,23 @@ issueCategoryIds:
 customIssueCategories:
   customIssues,
 
+
+
+<Autocomplete
+  open={issueOpen}
+  onOpen={() => setIssueOpen(true)}
+  onClose={() => setIssueOpen(false)}
+
+
+if (addIssueClicked) {
+  setShowCustomIssue(true);
+  setIssueOpen(false);
+
+  setSelectedIssues(
+    newValue.filter(
+      (item) => item.id !== "ADD_NEW"
+    )
+  );
+
+  return;
+}
