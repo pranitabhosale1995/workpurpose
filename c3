@@ -1,23 +1,38 @@
+
+import Chip from "@mui/material/Chip";
+import AddIcon from "@mui/icons-material/Add";
+
+
+const [showCustomIssue, setShowCustomIssue] =
+  useState(false);
+
 const [customIssueInput, setCustomIssueInput] =
   useState("");
 
+const [customIssues, setCustomIssues] =
+  useState([]);
+
 {showCustomIssue && (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      gap: 1,
-    }}
-  >
+  <Box sx={{ mt: 2 }}>
+
+    <Typography
+      variant="subtitle2"
+      sx={{ mb: 1 }}
+    >
+      Custom Issues
+    </Typography>
+
     <Box
       sx={{
         display: "flex",
         gap: 1,
+        alignItems: "center",
       }}
     >
       <TextField
         fullWidth
-        label="Add Issue"
+        size="small"
+        label="Enter New Issue"
         value={customIssueInput}
         onChange={(e) =>
           setCustomIssueInput(
@@ -28,6 +43,7 @@ const [customIssueInput, setCustomIssueInput] =
 
       <Button
         variant="contained"
+        startIcon={<AddIcon />}
         onClick={() => {
           if (
             !customIssueInput.trim()
@@ -41,53 +57,73 @@ const [customIssueInput, setCustomIssueInput] =
             ]
           );
 
-          setCustomIssueInput(
-            ""
-          );
+          setCustomIssueInput("");
         }}
       >
         Add
       </Button>
     </Box>
 
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 1,
-      }}
-    >
-      {customIssues.map(
-        (
-          issue,
-          index
-        ) => (
-          <Button
-            key={index}
-            size="small"
-            variant="outlined"
-            color="primary"
-            onClick={() =>
-              setCustomIssues(
-                customIssues.filter(
-                  (
-                    _,
-                    i
-                  ) =>
-                    i !==
-                    index
-                )
-              )
-            }
-          >
-            {issue} ✕
-          </Button>
-        )
+    {customIssues.length >
+      0 && (
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          {customIssues.map(
+            (
+              issue,
+              index
+            ) => (
+              <Chip
+                key={index}
+                label={issue}
+                onDelete={() =>
+                  setCustomIssues(
+                    customIssues.filter(
+                      (
+                        _,
+                        i
+                      ) =>
+                        i !==
+                        index
+                    )
+                  )
+                }
+              />
+            )
+          )}
+        </Box>
       )}
-    </Box>
   </Box>
 )}
 
 
+if (addIssueClicked) {
 
+  setShowCustomIssue(true);
+
+  setSelectedIssues(
+    newValue.filter(
+      (item) =>
+        item.id !==
+        "ADD_NEW"
+    )
+  );
+
+  return;
+}
+
+
+issueCategoryIds:
+  selectedIssues.map(
+    (item) => item.id
+  ),
+
+customIssueCategories:
+  customIssues,
 
