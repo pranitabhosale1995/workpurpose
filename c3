@@ -87,3 +87,69 @@ issueCategoryIds: selectedIssues.map(
 customIssueCategories: customIssues.filter(
   (item) => item.trim() !== ""
 ),
+
+
+
+
+
+
+
+
+
+
+
+
+const [showIssueInput, setShowIssueInput] = useState(false);
+
+
+<Button
+  size="small"
+  onClick={() =>
+    setShowIssueInput(true)
+  }
+>
+  + Add Issue
+</Button>
+
+{showIssueInput && (
+  <TextField
+    fullWidth
+    label="Add Issue"
+    value={customIssues[0] || ""}
+    onChange={(e) =>
+      setCustomIssues([e.target.value])
+    }
+  />
+)}
+
+
+<Autocomplete
+  multiple
+  disableCloseOnSelect
+  options={issueList}
+  value={selectedIssues}
+  onChange={(event, newValue) =>
+    setSelectedIssues(newValue)
+  }
+  getOptionLabel={(option) =>
+    option.issueCategoryName || ""
+  }
+  filterSelectedOptions
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Issues *"
+      placeholder="Search Issues"
+    />
+  )}
+
+
+
+issueCategoryIds: selectedIssues.map(
+  (item) => item.id
+),
+
+customIssueCategories:
+  customIssues.filter(
+    (item) => item.trim() !== ""
+  ),
