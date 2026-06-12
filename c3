@@ -53,4 +53,26 @@ if (name === "categoryId") {
     )}
   />
 
-</Box>
+</
+
+
+
+
+
+
+console.log("Selected Value =>", value);
+
+const selectedCategory =
+  voucherCategories.find(
+    (item) => item.id == value
+  );
+
+console.log(
+  "Selected Category =>",
+  selectedCategory
+);
+
+console.log(
+  "Issues =>",
+  selectedCategory?.issueCategories
+);
