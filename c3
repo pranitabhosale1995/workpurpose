@@ -153,3 +153,40 @@ customIssueCategories:
   customIssues.filter(
     (item) => item.trim() !== ""
   ),
+
+
+
+
+<Autocomplete
+  multiple
+  disableCloseOnSelect
+  options={issueList}
+  value={selectedIssues}
+  onChange={(event, newValue) =>
+    setSelectedIssues(newValue)
+  }
+  getOptionLabel={(option) =>
+    option.issueCategoryName || ""
+  }
+  filterSelectedOptions
+  renderOption={(
+    props,
+    option,
+    { selected }
+  ) => (
+    <li {...props}>
+      <Checkbox
+        checked={selected}
+        size="small"
+      />
+      {option.issueCategoryName}
+    </li>
+  )}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Issues *"
+      placeholder="Search Issues"
+    />
+  )}
+/>
