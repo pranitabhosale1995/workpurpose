@@ -84,3 +84,17 @@ onOpen={() => {
 
   setIssueOpen(true);
 }}
+
+
+
+
+
+<Button
+  variant="outlined"
+  onClick={() => {
+    handleReset();
+    setOpenDialog(false);
+  }}
+>
+  Create New Voucher
+</Button>
