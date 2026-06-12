@@ -1,200 +1,93 @@
-
-<Autocomplete
-  multiple
-  disableCloseOnSelect
-  options={[
-    ...issueList,
-    {
-      id: "ADD_NEW",
-      issueCategoryName: "+ Add Issue",
-    },
-  ]}
-  value={selectedIssues}
-  onChange={(event, newValue) => {
-
-    const addIssueClicked =
-      newValue.find(
-        (item) => item.id === "ADD_NEW"
-      );
-
-    if (addIssueClicked) {
-      setShowCustomIssue(true);
-
-      setSelectedIssues(
-        newValue.filter(
-          (item) =>
-            item.id !== "ADD_NEW"
-        )
-      );
-
-      return;
-    }
-
-    setSelectedIssues(newValue);
-  }}
-  getOptionLabel={(option) =>
-    option.issueCategoryName || ""
-  }
-  renderOption={(
-    props,
-    option,
-    { selected }
-  ) => (
-    <li {...props}>
-      {option.id !== "ADD_NEW" && (
-        <Checkbox
-          checked={selected}
-          size="small"
-        />
-      )}
-
-      {option.issueCategoryName}
-    </li>
-  )}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Issues *"
-      placeholder="Search Issues"
-    />
-  )}
-/>
-
-
-
-const [showCustomIssue, setShowCustomIssue] =
-  useState(false);
-
-
+const [customIssueInput, setCustomIssueInput] =
+  useState("");
 
 {showCustomIssue && (
-  <TextField
-    fullWidth
-    label="Add Issue"
-    value={customIssues[0] || ""}
-    onChange={(e) =>
-      setCustomIssues([
-        e.target.value,
-      ])
-    }
-  />
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 1,
+    }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        gap: 1,
+      }}
+    >
+      <TextField
+        fullWidth
+        label="Add Issue"
+        value={customIssueInput}
+        onChange={(e) =>
+          setCustomIssueInput(
+            e.target.value
+          )
+        }
+      />
+
+      <Button
+        variant="contained"
+        onClick={() => {
+          if (
+            !customIssueInput.trim()
+          )
+            return;
+
+          setCustomIssues(
+            (prev) => [
+              ...prev,
+              customIssueInput.trim(),
+            ]
+          );
+
+          setCustomIssueInput(
+            ""
+          );
+        }}
+      >
+        Add
+      </Button>
+    </Box>
+
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 1,
+      }}
+    >
+      {customIssues.map(
+        (
+          issue,
+          index
+        ) => (
+          <Button
+            key={index}
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={() =>
+              setCustomIssues(
+                customIssues.filter(
+                  (
+                    _,
+                    i
+                  ) =>
+                    i !==
+                    index
+                )
+              )
+            }
+          >
+            {issue} ✕
+          </Button>
+        )
+      )}
+    </Box>
+  </Box>
 )}
 
 
 
 
-
-
-<Box
-  sx={{
-    display: "grid",
-    gridTemplateColumns:
-      showCustomIssue
-        ? "1fr 1fr"
-        : "1fr",
-    gap: 3,
-
-    "@media (max-width:900px)": {
-      gridTemplateColumns: "1fr",
-    },
-  }}
->
-  <Autocomplete
-    multiple
-    disableCloseOnSelect
-    options={[
-      ...issueList,
-      {
-        id: "ADD_NEW",
-        issueCategoryName:
-          "+ Add Issue",
-      },
-    ]}
-    value={selectedIssues}
-    onChange={(
-      event,
-      newValue
-    ) => {
-      const addIssueClicked =
-        newValue.find(
-          (item) =>
-            item.id ===
-            "ADD_NEW"
-        );
-
-      if (
-        addIssueClicked
-      ) {
-        setShowCustomIssue(
-          true
-        );
-
-        setSelectedIssues(
-          newValue.filter(
-            (item) =>
-              item.id !==
-              "ADD_NEW"
-          )
-        );
-
-        return;
-      }
-
-      setSelectedIssues(
-        newValue
-      );
-    }}
-    getOptionLabel={(
-      option
-    ) =>
-      option.issueCategoryName ||
-      ""
-    }
-    renderOption={(
-      props,
-      option,
-      { selected }
-    ) => (
-      <li {...props}>
-        {option.id !==
-          "ADD_NEW" && (
-            <Checkbox
-              checked={
-                selected
-              }
-              size="small"
-            />
-          )}
-
-        {
-          option.issueCategoryName
-        }
-      </li>
-    )}
-    renderInput={(
-      params
-    ) => (
-      <TextField
-        {...params}
-        label="Issues *"
-        placeholder="Search Issues"
-      />
-    )}
-  />
-
-  {showCustomIssue && (
-    <TextField
-      fullWidth
-      label="Add Issue"
-      value={
-        customIssues[0] ||
-        ""
-      }
-      onChange={(e) =>
-        setCustomIssues([
-          e.target.value,
-        ])
-      }
-    />
-  )}
-</Box>
