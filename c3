@@ -1,40 +1,25 @@
-const [issueList, setIssueList] = useState([]);
-const [selectedIssues, setSelectedIssues] = useState([]);
-const [customIssues, setCustomIssues] = useState([""]);
 
-import Autocomplete from "@mui/material/Autocomplete";
-import Checkbox from "@mui/material/Checkbox";
+<Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 3,
 
-
-if (name === "categoryId") {
-
-  const selectedCategory =
-    voucherCategories.find(
-      (item) => item.id === value
-    );
-
-  setIssueList(
-    selectedCategory?.issueCategories || []
-  );
-
-  setSelectedIssues([]);
-  setCustomIssues([""]);
-}
-
-
-
-<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
+    "@media (max-width:900px)": {
+      gridTemplateColumns: "1fr",
+    },
+  }}
+>
   <Autocomplete
     multiple
+    disableCloseOnSelect
     options={issueList}
     value={selectedIssues}
     onChange={(event, newValue) =>
       setSelectedIssues(newValue)
     }
-    disableCloseOnSelect
     getOptionLabel={(option) =>
-      option.issueName || ""
+      option.issueCategoryName || ""
     }
     renderOption={(props, option, { selected }) => (
       <li {...props}>
@@ -42,76 +27,18 @@ if (name === "categoryId") {
           checked={selected}
           size="small"
         />
-        {option.issueName}
+        {option.issueCategoryName}
       </li>
     )}
     renderInput={(params) => (
       <TextField
         {...params}
         label="Issues *"
+        placeholder="Search Issues"
       />
     )}
   />
 
-</
-
-
-
-
-
-
-console.log("Selected Value =>", value);
-
-const selectedCategory =
-  voucherCategories.find(
-    (item) => item.id == value
-  );
-
-console.log(
-  "Selected Category =>",
-  selectedCategory
-);
-
-console.log(
-  "Issues =>",
-  selectedCategory?.issueCategories
-);
-
-
-
-
-issueCategoryIds: selectedIssues.map(
-  (item) => item.id
-),
-
-customIssueCategories: customIssues.filter(
-  (item) => item.trim() !== ""
-),
-
-
-
-
-
-
-
-
-
-
-
-
-const [showIssueInput, setShowIssueInput] = useState(false);
-
-
-<Button
-  size="small"
-  onClick={() =>
-    setShowIssueInput(true)
-  }
->
-  + Add Issue
-</Button>
-
-{showIssueInput && (
   <TextField
     fullWidth
     label="Add Issue"
@@ -120,73 +47,4 @@ const [showIssueInput, setShowIssueInput] = useState(false);
       setCustomIssues([e.target.value])
     }
   />
-)}
-
-
-<Autocomplete
-  multiple
-  disableCloseOnSelect
-  options={issueList}
-  value={selectedIssues}
-  onChange={(event, newValue) =>
-    setSelectedIssues(newValue)
-  }
-  getOptionLabel={(option) =>
-    option.issueCategoryName || ""
-  }
-  filterSelectedOptions
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Issues *"
-      placeholder="Search Issues"
-    />
-  )}
-
-
-
-issueCategoryIds: selectedIssues.map(
-  (item) => item.id
-),
-
-customIssueCategories:
-  customIssues.filter(
-    (item) => item.trim() !== ""
-  ),
-
-
-
-
-<Autocomplete
-  multiple
-  disableCloseOnSelect
-  options={issueList}
-  value={selectedIssues}
-  onChange={(event, newValue) =>
-    setSelectedIssues(newValue)
-  }
-  getOptionLabel={(option) =>
-    option.issueCategoryName || ""
-  }
-  filterSelectedOptions
-  renderOption={(
-    props,
-    option,
-    { selected }
-  ) => (
-    <li {...props}>
-      <Checkbox
-        checked={selected}
-        size="small"
-      />
-      {option.issueCategoryName}
-    </li>
-  )}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Issues *"
-      placeholder="Search Issues"
-    />
-  )}
-/>
+</Box>
