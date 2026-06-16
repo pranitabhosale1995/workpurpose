@@ -1,0 +1,80 @@
+<DialogContent>
+  <Box
+    sx={{
+      bgcolor: "#f8fafc",
+      borderRadius: 2,
+      p: 3,
+      mt: 1,
+      border: "1px solid #e2e8f0",
+    }}
+  >
+    <Typography
+      variant="subtitle2"
+      sx={{
+        color: "#64748b",
+        mb: 1,
+        fontWeight: 600,
+      }}
+    >
+      Description
+    </Typography>
+
+    <Typography
+      variant="body1"
+      sx={{
+        whiteSpace: "pre-wrap",
+        color: "#1e293b",
+        mb: 3,
+      }}
+    >
+      {selectedDescription}
+    </Typography>
+
+    <Typography
+      variant="subtitle2"
+      sx={{
+        color: "#64748b",
+        mb: 1,
+        fontWeight: 600,
+      }}
+    >
+      Issues
+    </Typography>
+
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 1,
+      }}
+    >
+      {selectedIssues?.length > 0 ? (
+        selectedIssues.map(
+          (issue, index) => (
+            <Box
+              key={index}
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                bgcolor: "#ede9fe",
+                color: "#6d28d9",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: 600,
+              }}
+            >
+              {issue}
+            </Box>
+          )
+        )
+      ) : (
+        <Typography
+          variant="body2"
+          color="text.secondary"
+        >
+          No Issues Available
+        </Typography>
+      )}
+    </Box>
+  </Box>
+</DialogContent>
