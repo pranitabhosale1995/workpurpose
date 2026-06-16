@@ -33,3 +33,19 @@
     No Issues Available
   </Typography>
 )}
+
+
+
+<Typography
+  variant="body1"
+  sx={{
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    lineHeight: 1.8,
+    color: "text.primary",
+    textAlign: "justify",
+  }}
+>
+  {selectedDescription || "-"}
+</Typography>
