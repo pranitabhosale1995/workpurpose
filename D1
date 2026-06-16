@@ -31,3 +31,6 @@ const fileTypesRes = async () => {
     </MenuItem>
   ))
 }
+
+console.log("asciiOptions =", asciiOptions);
+console.log("isArray =", Array.isArray(asciiOptions));
