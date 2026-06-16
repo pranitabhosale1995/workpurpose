@@ -1,143 +1,3 @@
-const [vidError, setVidError] = useState("");
-
-const validateVID = (value) => {
-  if (!value) {
-    setVidError("");
-    return;
-  }
-
-  if (value.length > 50) {
-    setVidError("Maximum 50 characters allowed");
-    return;
-  }
-
-  if (!/^VID[0-9-]*$/.test(value)) {
-    setVidError(
-      "VID must start with VID and contain only numbers and hyphen"
-    );
-    return;
-  }
-
-  setVidError("");
-};
-
-
-<TextField
-  size="small"
-  label="Search By VID"
-  value={searchVID}
-  error={Boolean(vidError)}
-  helperText={vidError}
-  onChange={(e) => {
-    const value = e.target.value.toUpperCase();
-
-    setSearchVID(value);
-    validateVID(value);
-  }}
-/>
-
-
-
-
-
-<TextField
-  size="small"
-  label="VID"
-  value={searchVID}
-  error={Boolean(vidError)}
-  helperText={vidError || " "}
-  FormHelperTextProps={{
-    sx: {
-      minHeight: "20px",
-      marginLeft: 0,
-    },
-  }}
-  onChange={handleVIDChange}
-/>
-
-
-
-const handleVIDChange = (e) => {
-  const value = e.target.value.toUpperCase();
-
-  // Max length
-  if (value.length > 50) {
-    setVidError("Maximum 50 characters allowed");
-    return;
-  }
-
-  // First 3 chars VID allow
-  if (
-    value.length <= 3 &&
-    !"VID".startsWith(value)
-  ) {
-    setVidError("Must start with VID");
-    return;
-  }
-
-  // VID nantar fakt number ani hyphen
-  if (
-    value.length > 3 &&
-    !/^VID[0-9-]*$/.test(value)
-  ) {
-    setVidError(
-      "Only numbers and hyphen allowed after VID"
-    );
-    return;
-  }
-
-  setVidError("");
-  setSearchVID(value);
-};
-
-
-
-<TextField
-  size="small"
-  label="VID"
-  value={searchVID}
-  error={Boolean(vidError)}
-  helperText={vidError || " "}
-  onChange={handleVIDChange}
-/>
-
-
-
-
-const fileTypesRes = async () => {
-  try {
-    const response = await callApi(
-      "/api/ascii/file-types",
-      null,
-      "GET"
-    );
-
-    console.log("API Response:", response);
-
-    if (response?.success) {
-      setAsciiOptions(response.data || []);
-    } else {
-      setAsciiOptions([]);
-    }
-
-  } catch (error) {
-    console.error("File Types API Error:", error);
-    setAsciiOptions([]);
-  }
-};
-
-
-<select>
-  {asciiOptions.map((item) => (
-    <option key={item.id} value={item.id}>
-      {item.asciiName}
-    </option>
-  ))}
-</select>
-
-
-
-const [asciiOptions, setAsciiOptions] = useState([]);
 
 const fileTypesRes = async () => {
   try {
@@ -147,16 +7,27 @@ const fileTypesRes = async () => {
       "GET"
     );
 
-    console.log("ASCII API Response =>", response);
+    console.log("FULL RESPONSE =>", response);
+    console.log("DATA =>", response?.data);
 
-    const options = Array.isArray(response?.data)
-      ? response.data
-      : [];
-
-    setAsciiOptions(options);
-
+    setAsciiOptions(
+      Array.isArray(response?.data)
+        ? response.data
+        : []
+    );
   } catch (error) {
     console.error("File Types API Error =>", error);
     setAsciiOptions([]);
   }
 };
+
+
+
+
+{Array.isArray(asciiOptions) &&
+  asciiOptions.map((item) => (
+    <MenuItem key={item.id} value={item.id}>
+      {item.asciiName}
+    </MenuItem>
+  ))
+}
