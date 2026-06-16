@@ -25,3 +25,12 @@ const validateSearch = () => {
 
   return true;
 };
+
+
+const handleSearch = () => {
+  if (!validateSearch()) {
+    return;
+  }
+
+  fetchVouchers();
+};
