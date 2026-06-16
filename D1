@@ -134,3 +134,29 @@ const fileTypesRes = async () => {
     </option>
   ))}
 </select>
+
+
+
+const [asciiOptions, setAsciiOptions] = useState([]);
+
+const fileTypesRes = async () => {
+  try {
+    const response = await callApi(
+      "/RS/ascii/file-types",
+      null,
+      "GET"
+    );
+
+    console.log("ASCII API Response =>", response);
+
+    const options = Array.isArray(response?.data)
+      ? response.data
+      : [];
+
+    setAsciiOptions(options);
+
+  } catch (error) {
+    console.error("File Types API Error =>", error);
+    setAsciiOptions([]);
+  }
+};
