@@ -1,112 +1,35 @@
-<DialogContent sx={{ p: 0 }}>
-  {/* Description Section */}
+<Typography
+  variant="subtitle2"
+  sx={{
+    fontWeight: 700,
+    mb: 1.5,
+  }}
+>
+  Issues
+</Typography>
 
+{selectedIssues.length > 0 ? (
   <Box
+    component="ul"
     sx={{
-      px: 3,
-      py: 2,
-      borderBottom: "1px solid #e0e0e0",
+      pl: 3,
+      m: 0,
     }}
   >
-    <Typography
-      variant="subtitle2"
-      sx={{
-        fontWeight: 700,
-        mb: 1,
-      }}
-    >
-      Description
-    </Typography>
-
-    <Typography
-      variant="body1"
-      sx={{
-        whiteSpace: "pre-wrap",
-        minHeight: 80,
-      }}
-    >
-      {selectedDescription || "-"}
-    </Typography>
-  </Box>
-
-  {/* Issues Section */}
-
-  <Box
-    sx={{
-      px: 3,
-      py: 2,
-    }}
-  >
-    <Typography
-      variant="subtitle2"
-      sx={{
-        fontWeight: 700,
-        mb: 1.5,
-      }}
-    >
-      Issues
-    </Typography>
-
-    {Array.isArray(selectedIssues) &&
-    selectedIssues.length > 0 ? (
-      <Box component="ul"
-        sx={{
-          pl: 3,
-          m: 0,
-        }}
-      >
-        {selectedIssues.map(
-          (issue, index) => (
-            <li key={index}>
-              <Typography>
-                {typeof issue ===
-                "object"
-                  ? issue.name ||
-                    issue.issueName
-                  : issue}
-              </Typography>
-            </li>
-          )
-        )}
-      </Box>
-    ) : (
-      <Typography
-        color="text.secondary"
-      >
-        No Issues Available
-      </Typography>
+    {selectedIssues.map(
+      (issue, index) => (
+        <li key={index}>
+          <Typography>
+            {issue}
+          </Typography>
+        </li>
+      )
     )}
   </Box>
-</DialogContent>
-
-
-
-<DialogTitle
-  sx={{
-    borderBottom:
-      "1px solid #e0e0e0",
-    fontWeight: 600,
-  }}
->
-  Details
-</DialogTitle>
-
-
-
-<DialogActions
-  sx={{
-    borderTop:
-      "1px solid #e0e0e0",
-    px: 3,
-    py: 2,
-  }}
->
-  <Button
-    variant="contained"
-    onClick={() =>
-      setDescriptionPopupOpen(false)
-    }
+) : (
+  <Typography
+    color="text.secondary"
   >
-    Close
-  </Button>
-</DialogActions>
+    No Issues Available
+  </Typography>
+)}
