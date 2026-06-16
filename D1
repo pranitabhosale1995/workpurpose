@@ -100,3 +100,28 @@ const handleVIDChange = (e) => {
   helperText={vidError || " "}
   onChange={handleVIDChange}
 />
+
+
+
+
+const fileTypesRes = async () => {
+  try {
+    const response = await callApi(
+      "/api/ascii/file-types",
+      null,
+      "GET"
+    );
+
+    console.log("API Response:", response);
+
+    if (response?.success) {
+      setAsciiOptions(response.data || []);
+    } else {
+      setAsciiOptions([]);
+    }
+
+  } catch (error) {
+    console.error("File Types API Error:", error);
+    setAsciiOptions([]);
+  }
+};
