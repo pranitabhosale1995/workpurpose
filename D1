@@ -35,3 +35,68 @@ const validateVID = (value) => {
     validateVID(value);
   }}
 />
+
+
+
+
+
+<TextField
+  size="small"
+  label="VID"
+  value={searchVID}
+  error={Boolean(vidError)}
+  helperText={vidError || " "}
+  FormHelperTextProps={{
+    sx: {
+      minHeight: "20px",
+      marginLeft: 0,
+    },
+  }}
+  onChange={handleVIDChange}
+/>
+
+
+
+const handleVIDChange = (e) => {
+  const value = e.target.value.toUpperCase();
+
+  // Max length
+  if (value.length > 50) {
+    setVidError("Maximum 50 characters allowed");
+    return;
+  }
+
+  // First 3 chars VID allow
+  if (
+    value.length <= 3 &&
+    !"VID".startsWith(value)
+  ) {
+    setVidError("Must start with VID");
+    return;
+  }
+
+  // VID nantar fakt number ani hyphen
+  if (
+    value.length > 3 &&
+    !/^VID[0-9-]*$/.test(value)
+  ) {
+    setVidError(
+      "Only numbers and hyphen allowed after VID"
+    );
+    return;
+  }
+
+  setVidError("");
+  setSearchVID(value);
+};
+
+
+
+<TextField
+  size="small"
+  label="VID"
+  value={searchVID}
+  error={Boolean(vidError)}
+  helperText={vidError || " "}
+  onChange={handleVIDChange}
+/>
