@@ -1,51 +1,27 @@
-<Typography
-  variant="subtitle2"
-  sx={{
-    fontWeight: 700,
-    mb: 1.5,
-  }}
->
-  Issues
-</Typography>
 
-{selectedIssues.length > 0 ? (
-  <Box
-    component="ul"
-    sx={{
-      pl: 3,
-      m: 0,
-    }}
-  >
-    {selectedIssues.map(
-      (issue, index) => (
-        <li key={index}>
-          <Typography>
-            {issue}
-          </Typography>
-        </li>
-      )
-    )}
-  </Box>
-) : (
-  <Typography
-    color="text.secondary"
-  >
-    No Issues Available
-  </Typography>
-)}
+const validateSearch = () => {
+  if (!searchVID) {
+    return true;
+  }
 
+  if (searchVID.length > 50) {
+    setSnackbar({
+      open: true,
+      message: "Maximum 50 characters allowed",
+      severity: "error",
+    });
+    return false;
+  }
 
+  if (!/^VID[0-9-]*$/.test(searchVID)) {
+    setSnackbar({
+      open: true,
+      message:
+        "VID must start with VID and contain only numbers and hyphen",
+      severity: "error",
+    });
+    return false;
+  }
 
-<Typography
-  variant="body1"
-  sx={{
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
-    lineHeight: 1.8,
-    color: "text.primary",
-    textAlign: "justify",
-  }}
->
-  {selectedDescription || "-"}
-</Typography>
+  return true;
+};
