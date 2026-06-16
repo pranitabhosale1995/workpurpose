@@ -1,36 +1,37 @@
+const [vidError, setVidError] = useState("");
 
-const validateSearch = () => {
-  if (!searchVID) {
-    return true;
-  }
-
-  if (searchVID.length > 50) {
-    setSnackbar({
-      open: true,
-      message: "Maximum 50 characters allowed",
-      severity: "error",
-    });
-    return false;
-  }
-
-  if (!/^VID[0-9-]*$/.test(searchVID)) {
-    setSnackbar({
-      open: true,
-      message:
-        "VID must start with VID and contain only numbers and hyphen",
-      severity: "error",
-    });
-    return false;
-  }
-
-  return true;
-};
-
-
-const handleSearch = () => {
-  if (!validateSearch()) {
+const validateVID = (value) => {
+  if (!value) {
+    setVidError("");
     return;
   }
 
-  fetchVouchers();
+  if (value.length > 50) {
+    setVidError("Maximum 50 characters allowed");
+    return;
+  }
+
+  if (!/^VID[0-9-]*$/.test(value)) {
+    setVidError(
+      "VID must start with VID and contain only numbers and hyphen"
+    );
+    return;
+  }
+
+  setVidError("");
 };
+
+
+<TextField
+  size="small"
+  label="Search By VID"
+  value={searchVID}
+  error={Boolean(vidError)}
+  helperText={vidError}
+  onChange={(e) => {
+    const value = e.target.value.toUpperCase();
+
+    setSearchVID(value);
+    validateVID(value);
+  }}
+/>
