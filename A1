@@ -61,3 +61,93 @@ if (
   newErrors.customIssue =
     "Please add this issue first";
 }
+
+
+
+<Button
+  size="small"
+  variant="contained"
+  startIcon={<AddIcon />}
+  onClick={() => {
+    const issue =
+      customIssueInput.trim();
+
+    if (!issue) {
+      setErrors((prev) => ({
+        ...prev,
+        customIssue:
+          "Please enter issue",
+      }));
+      return;
+    }
+
+    setCustomIssues((prev) => [
+      ...prev,
+      issue,
+    ]);
+
+    setErrors((prev) => ({
+      ...prev,
+      issues: "",
+      customIssue: "",
+    }));
+
+    setCustomIssueInput("");
+  }}
+>
+  Add
+</Button>
+
+if (
+  selectedIssues.length === 0 &&
+  customIssues.length === 0
+) {
+  newErrors.issues =
+    "Please select at least one issue";
+}
+
+if (
+  showCustomIssue &&
+  customIssueInput.trim() &&
+  customIssues.length === 0
+) {
+  newErrors.customIssue =
+    "Please add this issue first";
+}
+
+
+<TextField
+  fullWidth
+  label="Enter New Issue"
+  value={customIssueInput}
+  error={!!errors.customIssue}
+  helperText={
+    errors.customIssue
+      ? errors.customIssue
+      : `${customIssueInput.length}/50`
+  }
+  inputProps={{
+    maxLength: 50,
+  }}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    if (!/^[A-Za-z0-9 ]*$/.test(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        customIssue:
+          "Special characters are not allowed",
+      }));
+      return;
+    }
+
+    setCustomIssueInput(value);
+
+    setErrors((prev) => ({
+      ...prev,
+      customIssue: "",
+    }));
+  }}
+/>
+
+
