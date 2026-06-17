@@ -1,35 +1,23 @@
-renderInput={(params) => (
-  <TextField
-    {...params}
-    label="Issues *"
-    placeholder="Search Issues"
-    error={!!errors.issues}
-    helperText={errors.issues}
-  />
-)}
+if (showCustomIssue) {
+  const issue = customIssueInput.trim();
 
-
-
-
-
-
-const [customIssueError, setCustomIssueError] =
-  useState("");
-
-
-if (
-  showCustomIssue &&
-  customIssues.length === 0
-) {
-  newErrors.customIssue =
-    "Please add this issue first";
+  if (!issue) {
+    newErrors.customIssue =
+      "Please enter issue";
+  } else if (issue.length < 50) {
+    newErrors.customIssue =
+      "Minimum 50 characters required";
+  } else if (
+    !/^[A-Za-z0-9 ]+$/.test(issue)
+  ) {
+    newErrors.customIssue =
+      "Special characters are not allowed";
+  } else if (customIssues.length === 0) {
+    newErrors.customIssue =
+      "Please add this issue first";
+  }
 }
 
-
-setErrors((prev) => ({
-  ...prev,
-  customIssue: "",
-}));
 
 
 <TextField
@@ -39,11 +27,11 @@ setErrors((prev) => ({
   error={!!errors.customIssue}
   helperText={
     errors.customIssue
+      ? errors.customIssue
+      : `${customIssueInput.length}/50`
   }
   onChange={(e) => {
-    setCustomIssueInput(
-      e.target.value
-    );
+    setCustomIssueInput(e.target.value);
 
     setErrors((prev) => ({
       ...prev,
@@ -51,14 +39,3 @@ setErrors((prev) => ({
     }));
   }}
 />
-
-
-
-if (
-  selectedIssues.length === 0 &&
-  customIssues.length === 0 &&
-  !showCustomIssue
-) {
-  newErrors.issues =
-    "At least one issue is required";
-}
