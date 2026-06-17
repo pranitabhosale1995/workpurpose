@@ -1,29 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024">
+<svg width="1536" height="1024" viewBox="0 0 1536 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e9ddf2"/>
-      <stop offset="100%" stop-color="#9a7ad8"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1536" y2="1024">
+      <stop offset="0%" stop-color="#E9D8F5"/>
+      <stop offset="100%" stop-color="#8F63D9"/>
     </linearGradient>
 
-    <linearGradient id="wave" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#b79ae8"/>
-      <stop offset="100%" stop-color="#6f4ab6"/>
+    <linearGradient id="wave1" x1="0" y1="0" x2="1536" y2="0">
+      <stop offset="0%" stop-color="#DCC6F0" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#B68BE8" stop-opacity="0.7"/>
+    </linearGradient>
+
+    <linearGradient id="wave2" x1="0" y1="0" x2="1536" y2="0">
+      <stop offset="0%" stop-color="#C9A7EB" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#8E63D5" stop-opacity="0.5"/>
+    </linearGradient>
+
+    <linearGradient id="wave3" x1="0" y1="0" x2="1536" y2="0">
+      <stop offset="0%" stop-color="#B28AE3"/>
+      <stop offset="100%" stop-color="#6D43B8"/>
     </linearGradient>
   </defs>
 
-  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <rect width="1536" height="1024" fill="url(#bg)"/>
 
-  <path
-    d="M0,850 C250,720 500,900 768,850
-       C1050,800 1300,930 1536,760
-       L1536,1024 L0,1024 Z"
-    fill="url(#wave)"
-    opacity="0.85"/>
+  <path d="M0 250C300 400 700 380 1100 180C1300 80 1450 40 1536 0V1024H0V250Z"
+        fill="#FFFFFF" opacity="0.10"/>
 
-  <path
-    d="M0,930 C300,820 600,980 900,910
-       C1200,840 1400,940 1536,870
-       L1536,1024 L0,1024 Z"
-    fill="#d7b9f1"
-    opacity="0.35"/>
+  <path d="M0 350C350 520 850 500 1250 250C1400 160 1480 100 1536 50V1024H0V350Z"
+        fill="url(#wave1)"/>
+
+  <path d="M0 520C250 650 700 680 1100 480C1300 380 1450 300 1536 220V1024H0V520Z"
+        fill="url(#wave2)"/>
+
+  <path d="M0 820C180 760 350 760 520 790C760 830 980 850 1200 820C1360 800 1460 760 1536 720V1024H0V820Z"
+        fill="url(#wave3)"/>
+
+  <path d="M0 940C250 880 500 900 760 940C980 980 1260 980 1536 920V1024H0V940Z"
+        fill="#FFFFFF" opacity="0.08"/>
 </svg>
