@@ -1,41 +1,38 @@
 if (showCustomIssue) {
-  const issue = customIssueInput.trim();
+  const issue =
+    customIssueInput.trim();
 
   if (!issue) {
     newErrors.customIssue =
       "Please enter issue";
-  } else if (issue.length < 50) {
+  } else if (issue.length > 50) {
     newErrors.customIssue =
-      "Minimum 50 characters required";
-  } else if (
-    !/^[A-Za-z0-9 ]+$/.test(issue)
-  ) {
-    newErrors.customIssue =
-      "Special characters are not allowed";
-  } else if (customIssues.length === 0) {
-    newErrors.customIssue =
-      "Please add this issue first";
+      "Maximum 50 characters allowed";
   }
 }
 
 
 
-<TextField
-  fullWidth
-  label="Enter New Issue"
-  value={customIssueInput}
-  error={!!errors.customIssue}
-  helperText={
-    errors.customIssue
-      ? errors.customIssue
-      : `${customIssueInput.length}/50`
-  }
-  onChange={(e) => {
-    setCustomIssueInput(e.target.value);
+onChange={(e) => {
+  const value = e.target.value;
 
+  if (!/^[A-Za-z0-9 ]*$/.test(value)) {
     setErrors((prev) => ({
       ...prev,
-      customIssue: "",
+      customIssue:
+        "Special characters are not allowed",
     }));
-  }}
-/>
+    return;
+  }
+
+  setCustomIssueInput(value);
+
+  setErrors((prev) => ({
+    ...prev,
+    customIssue: "",
+  }));
+}}
+
+inputProps={{
+  maxLength: 50,
+}}
