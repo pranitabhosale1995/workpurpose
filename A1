@@ -36,3 +36,17 @@ onChange={(e) => {
 inputProps={{
   maxLength: 50,
 }}
+
+
+if (
+  selectedIssues.length === 0 &&
+  customIssues.length === 0
+) {
+  if (showCustomIssue) {
+    newErrors.customIssue =
+      "Please add the issue first";
+  } else {
+    newErrors.issues =
+      "Please select at least one issue";
+  }
+}
