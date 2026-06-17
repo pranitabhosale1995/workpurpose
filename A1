@@ -50,3 +50,14 @@ if (
       "Please select at least one issue";
   }
 }
+
+
+
+if (
+  showCustomIssue &&
+  customIssueInput.trim() &&
+  customIssues.length === 0
+) {
+  newErrors.customIssue =
+    "Please add this issue first";
+}
