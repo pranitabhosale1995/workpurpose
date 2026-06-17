@@ -7,3 +7,58 @@ renderInput={(params) => (
     helperText={errors.issues}
   />
 )}
+
+
+
+
+
+
+const [customIssueError, setCustomIssueError] =
+  useState("");
+
+
+if (
+  showCustomIssue &&
+  customIssues.length === 0
+) {
+  newErrors.customIssue =
+    "Please add this issue first";
+}
+
+
+setErrors((prev) => ({
+  ...prev,
+  customIssue: "",
+}));
+
+
+<TextField
+  fullWidth
+  label="Enter New Issue"
+  value={customIssueInput}
+  error={!!errors.customIssue}
+  helperText={
+    errors.customIssue
+  }
+  onChange={(e) => {
+    setCustomIssueInput(
+      e.target.value
+    );
+
+    setErrors((prev) => ({
+      ...prev,
+      customIssue: "",
+    }));
+  }}
+/>
+
+
+
+if (
+  selectedIssues.length === 0 &&
+  customIssues.length === 0 &&
+  !showCustomIssue
+) {
+  newErrors.issues =
+    "At least one issue is required";
+}
