@@ -46,3 +46,14 @@ onClick={() => {
 
   setCustomIssueInput("");
 }}
+
+onChange={(e) => {
+  setCustomIssueInput(
+    e.target.value
+  );
+
+  setErrors((prev) => ({
+    ...prev,
+    customIssue: "",
+  }));
+}}
