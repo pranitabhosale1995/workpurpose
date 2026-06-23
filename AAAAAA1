@@ -1,193 +1,3 @@
-onClick={() => {
-  const newIssue =
-    customIssueInput.trim();
-
-  if (!newIssue) return;
-
-  const alreadyExistsInMaster =
-    issueList.some(
-      (item) =>
-        item.issueCategoryName
-          ?.trim()
-          .toLowerCase() ===
-        newIssue.toLowerCase()
-    );
-
-  const alreadyExistsInCustom =
-    customIssues.some(
-      (item) =>
-        item.trim().toLowerCase() ===
-        newIssue.toLowerCase()
-    );
-
-  if (
-    alreadyExistsInMaster ||
-    alreadyExistsInCustom
-  ) {
-    setErrors((prev) => ({
-      ...prev,
-      customIssue:
-        "Issue already exists",
-    }));
-
-    return;
-  }
-
-  setCustomIssues((prev) => [
-    ...prev,
-    newIssue,
-  ]);
-
-  setErrors((prev) => ({
-    ...prev,
-    issues: "",
-    customIssue: "",
-  }));
-
-  setCustomIssueInput("");
-}}
-
-onChange={(e) => {
-  setCustomIssueInput(
-    e.target.value
-  );
-
-  setErrors((prev) => ({
-    ...prev,
-    customIssue: "",
-  }));
-}}
-
-
-
-if (
-  selectedCategory?.categoryName === "Other" &&
-  formData.otherCategory.trim()
-) {
-  const categoryExists =
-    voucherCategories.some(
-      (item) =>
-        item.categoryName
-          ?.trim()
-          .toLowerCase() ===
-        formData.otherCategory
-          .trim()
-          .toLowerCase()
-    );
-
-  if (categoryExists) {
-    newErrors.otherCategory =
-      "Category already exists";
-  }
-}
-
-
-
- const validateForm = () => {
-    let newErrors = {};
- 
-    if (!formData.categoryId) {
-      newErrors.categoryId =
-        "Voucher Category is required";
-    }
- 
-    const selectedCategory =
-      voucherCategories.find(
-        (item) =>
-          item.id ===
-          formData.categoryId
-      );
- 
-    if (
-      selectedCategory?.categoryName ===
-      "Other" &&
-      !formData.otherCategory.trim()
-    ) {
-      newErrors.otherCategory =
-        "Please enter other category";
-    }
- if (
-  selectedCategory?.categoryName === "Other" &&
-  formData.otherCategory.trim()
-) {
-  const categoryExists =
-    voucherCategories.some(
-      (item) =>
-        item.categoryName
-          ?.trim()
-          .toLowerCase() ===
-        formData.otherCategory
-          .trim()
-          .toLowerCase()
-    );
-
-  if (categoryExists) {
-    newErrors.otherCategory =
-      "Category already exists";
-  }
-}
-    if (
-      !formData.description.trim()
-    ) {
-      newErrors.description =
-        "Description is required";
-    }
- 
-    if (
-      formData.description.length >
-      500
-    ) {
-      newErrors.description =
-        "Maximum 500 Characters Allowed";
-    }
- 
-    if (!formData.roleId) {
-      newErrors.roleId =
-        "Allowed Role is required";
-    }
-    if (selectedIssues.length === 0 &&
-         customIssues.filter(
-        (item) => item?.trim()
-        ).length === 0
-      ){
-        newErrors.issues =
-       "At least one issue is required";
-      }
-if (
-  selectedIssues.length === 0 &&
-  customIssues.length === 0
-) {
-  if (showCustomIssue) {
-    newErrors.customIssue =
-      "Please add the issue first";
-  } else {
-    newErrors.issues =
-      "Please select at least one issue";
-  }
-}
- 
-if (
-  showCustomIssue &&
-  customIssueInput.trim() &&
-  customIssues.length === 0
-) {
-  newErrors.customIssue =
-    "Please add this issue first";
-}
- 
- 
-    setErrors(newErrors);
- 
-    return (
-      Object.keys(newErrors)
-        .length === 0
-    );
-  };
-
-
-
-
-
 const validateForm = () => {
   let newErrors = {};
 
@@ -209,14 +19,20 @@ const validateForm = () => {
   );
 
   console.log(
+    "Form Category Id =>",
+    formData.categoryId
+  );
+
+  console.log(
     "Entered Other Category =>",
     formData.otherCategory
   );
 
   // Other Category Validation
   if (
-    selectedCategory?.categoryName ===
-      "Other" &&
+    selectedCategory?.categoryName
+      ?.trim()
+      .toLowerCase() === "other" &&
     !formData.otherCategory.trim()
   ) {
     newErrors.otherCategory =
@@ -224,8 +40,9 @@ const validateForm = () => {
   }
 
   if (
-    selectedCategory?.categoryName ===
-      "Other" &&
+    selectedCategory?.categoryName
+      ?.trim()
+      .toLowerCase() === "other" &&
     formData.otherCategory.trim()
   ) {
     const enteredCategory =
@@ -236,18 +53,15 @@ const validateForm = () => {
     const categoryExists =
       voucherCategories.some(
         (item) => {
-          const categoryName =
+          const match =
             item.categoryName
               ?.trim()
-              .toLowerCase();
-
-          const match =
-            categoryName ===
+              .toLowerCase() ===
             enteredCategory;
 
           console.log(
             "Comparing =>",
-            categoryName,
+            item.categoryName,
             enteredCategory,
             match
           );
@@ -259,11 +73,6 @@ const validateForm = () => {
     console.log(
       "Category Exists =>",
       categoryExists
-    );
-
-    console.log(
-      "All Categories =>",
-      voucherCategories
     );
 
     if (categoryExists) {
