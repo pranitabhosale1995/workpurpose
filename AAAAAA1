@@ -57,3 +57,26 @@ onChange={(e) => {
     customIssue: "",
   }));
 }}
+
+
+
+if (
+  selectedCategory?.categoryName === "Other" &&
+  formData.otherCategory.trim()
+) {
+  const categoryExists =
+    voucherCategories.some(
+      (item) =>
+        item.categoryName
+          ?.trim()
+          .toLowerCase() ===
+        formData.otherCategory
+          .trim()
+          .toLowerCase()
+    );
+
+  if (categoryExists) {
+    newErrors.otherCategory =
+      "Category already exists";
+  }
+}
