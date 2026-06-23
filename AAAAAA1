@@ -183,3 +183,156 @@ if (
         .length === 0
     );
   };
+
+
+
+
+
+const validateForm = () => {
+  let newErrors = {};
+
+  if (!formData.categoryId) {
+    newErrors.categoryId =
+      "Voucher Category is required";
+  }
+
+  const selectedCategory =
+    voucherCategories.find(
+      (item) =>
+        String(item.id) ===
+        String(formData.categoryId)
+    );
+
+  console.log(
+    "Selected Category =>",
+    selectedCategory
+  );
+
+  console.log(
+    "Entered Other Category =>",
+    formData.otherCategory
+  );
+
+  // Other Category Validation
+  if (
+    selectedCategory?.categoryName ===
+      "Other" &&
+    !formData.otherCategory.trim()
+  ) {
+    newErrors.otherCategory =
+      "Please enter other category";
+  }
+
+  if (
+    selectedCategory?.categoryName ===
+      "Other" &&
+    formData.otherCategory.trim()
+  ) {
+    const enteredCategory =
+      formData.otherCategory
+        .trim()
+        .toLowerCase();
+
+    const categoryExists =
+      voucherCategories.some(
+        (item) => {
+          const categoryName =
+            item.categoryName
+              ?.trim()
+              .toLowerCase();
+
+          const match =
+            categoryName ===
+            enteredCategory;
+
+          console.log(
+            "Comparing =>",
+            categoryName,
+            enteredCategory,
+            match
+          );
+
+          return match;
+        }
+      );
+
+    console.log(
+      "Category Exists =>",
+      categoryExists
+    );
+
+    console.log(
+      "All Categories =>",
+      voucherCategories
+    );
+
+    if (categoryExists) {
+      newErrors.otherCategory =
+        "Category already exists";
+    }
+  }
+
+  if (
+    !formData.description.trim()
+  ) {
+    newErrors.description =
+      "Description is required";
+  }
+
+  if (
+    formData.description.length >
+    500
+  ) {
+    newErrors.description =
+      "Maximum 500 Characters Allowed";
+  }
+
+  if (!formData.roleId) {
+    newErrors.roleId =
+      "Allowed Role is required";
+  }
+
+  if (
+    selectedIssues.length === 0 &&
+    customIssues.filter(
+      (item) => item?.trim()
+    ).length === 0
+  ) {
+    newErrors.issues =
+      "At least one issue is required";
+  }
+
+  if (
+    selectedIssues.length === 0 &&
+    customIssues.length === 0
+  ) {
+    if (showCustomIssue) {
+      newErrors.customIssue =
+        "Please add the issue first";
+    } else {
+      newErrors.issues =
+        "Please select at least one issue";
+    }
+  }
+
+  if (
+    showCustomIssue &&
+    customIssueInput.trim() &&
+    customIssues.length === 0
+  ) {
+    newErrors.customIssue =
+      "Please add this issue first";
+  }
+
+  console.log(
+    "Validation Errors =>",
+    newErrors
+  );
+
+  setErrors(newErrors);
+
+  return (
+    Object.keys(newErrors)
+      .length === 0
+  );
+};
