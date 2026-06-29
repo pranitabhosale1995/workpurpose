@@ -65,3 +65,18 @@ setVoucherCategories(sortedCategories);
 </MenuItem>
 
 selectedCategory?.categoryName === "Other"
+
+
+
+
+slotProps={{
+  textField: {
+    size: "small",
+    fullWidth: true,
+    helperText: "Select a date for search",
+    onKeyDown: (e) => e.preventDefault(),
+    inputProps: {
+      readOnly: true,
+    },
+  },
+}}
