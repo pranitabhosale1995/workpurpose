@@ -150,3 +150,52 @@ const validate = () => {
 };
 
 setErrors({});
+
+
+
+<Box
+  sx={{
+    display: "flex",
+    gap: 1,
+    alignItems: "flex-start",
+    pt: "4px",
+  }}
+>
+  <Button
+    variant="contained"
+    onClick={() =>
+      handleSearch(
+        paginationModel.page,
+        paginationModel.pageSize
+      )
+    }
+    sx={{
+      minWidth: 90,
+      height: 40,
+    }}
+  >
+    Search
+  </Button>
+
+  <Button
+    variant="outlined"
+    onClick={handleReset}
+    sx={{
+      minWidth: 90,
+      height: 40,
+    }}
+  >
+    Reset
+  </Button>
+</Box>
+
+
+<Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns: "1.2fr 1fr 1fr auto",
+    gap: 2,
+    alignItems: "start",
+    mb: 2,
+  }}
+>
