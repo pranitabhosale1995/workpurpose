@@ -1,0 +1,66 @@
+const fetchVouchers = async () => {
+
+  // Search button click झाल्यावरच column change होईल
+  setSearchedStatus(searchStatus || "ACTIVE");
+
+  setLoading(true);
+
+  try {
+    let url = "/VE/voucher-transactions/search-vid";
+    const queryParams = [];
+
+    // Default table load
+    if (
+      !searchVID &&
+      !searchStatus &&
+      !searchDate &&
+      !searchCategory
+    ) {
+      queryParams.push("status=ACTIVE");
+    }
+
+    if (searchVID) {
+      queryParams.push(`vid=${searchVID}`);
+    }
+
+    if (searchStatus) {
+      queryParams.push(`status=${searchStatus}`);
+    }
+
+    if (searchDate) {
+      queryParams.push(
+        `date=${dayjs(searchDate).format("YYYY-MM-DD")}`
+      );
+    }
+
+    if (searchCategory) {
+      queryParams.push(`categoryId=${searchCategory}`);
+    }
+
+    if (queryParams.length > 0) {
+      url += "?" + queryParams.join("&");
+    }
+
+    console.log("Table URL =>", url);
+
+    const response = await callApi(url, null, "GET");
+
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    setRows(data);
+
+  } catch (error) {
+    console.error("Fetch Error =>", error);
+
+    setSnackbar({
+      open: true,
+      message: "Failed to fetch vouchers",
+      severity: "error",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
