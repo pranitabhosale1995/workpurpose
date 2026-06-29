@@ -1,0 +1,56 @@
+<DatePicker
+  label="Date"
+  value={transactionDate}
+  minDate={dayjs("2026-04-01")}
+  maxDate={dayjs()}
+  disableFuture
+  format="DD-MM-YYYY"
+  onChange={(value) => {
+    settransactionDate(value);
+    setErrors((prev) => ({
+      ...prev,
+      transactionDate: "",
+    }));
+  }}
+  slotProps={{
+    field: {
+      readOnly: true,
+    },
+    textField: {
+      fullWidth: true,
+      size: "small",
+      error: !!errors.transactionDate,
+      helperText:
+        errors.transactionDate ||
+        "Select Transaction Date",
+      onKeyDown: (e) => e.preventDefault(),
+      onPaste: (e) => e.preventDefault(),
+    },
+  }}
+/>
+
+
+
+<TextField
+  label="CGL"
+  size="small"
+  value={cgl}
+  error={Boolean(cglError)}
+  helperText={cglError || "Enter CGL (Maximum 10 digits)."}
+  onChange={handleCLGChange}
+  fullWidth
+/>
+
+<TextField
+  label="Branch Code"
+  size="small"
+  value={branchCode}
+  error={Boolean(branchCodeError)}
+  helperText={
+    branchCodeError ||
+    "Enter Branch Code (Maximum 5 digits)."
+  }
+  onChange={handlebranchCodeChange}
+  fullWidth
+/>
+
