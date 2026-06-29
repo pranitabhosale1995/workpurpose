@@ -1,73 +1,21 @@
-import Tooltip from "@mui/material/Tooltip";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+<TextField
+  label="VID"
+  size="small"
+  value={searchVID}
+  error={Boolean(vidError)}
+  helperText={
+    vidError
+      ? vidError
+      : "Format: VID followed by numbers (e.g. VID12345). Leave blank to search all Active vouchers."
+  }
+  onChange={handleVIDChange}
+/>
+
+<FormHelperText>
+Select the voucher status to filter the records.
+</FormHelperText>
 
 
-<Box>
-  <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-    <Typography variant="body2">VID</Typography>
-
-    <Tooltip title="Enter the Voucher ID (e.g. VID12345). Leave blank to search all active vouchers.">
-      <InfoOutlinedIcon
-        fontSize="small"
-        sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
-      />
-    </Tooltip>
-  </Box>
-
-  <TextField
-    fullWidth
-    size="small"
-    placeholder="Enter VID"
-    value={searchVID}
-    error={Boolean(vidError)}
-    helperText={vidError || " "}
-    onChange={handleVIDChange}
-  />
-</Box>
-
-
-<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-  <Typography variant="body2">Date</Typography>
-
-  <Tooltip title="Select the voucher creation date. Future dates are not allowed.">
-    <InfoOutlinedIcon
-      fontSize="small"
-      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
-    />
-  </Tooltip>
-</Box>
-
-<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-  <Typography variant="body2">Status</Typography>
-
-  <Tooltip title="Select the voucher status to filter records.">
-    <InfoOutlinedIcon
-      fontSize="small"
-      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
-    />
-  </Tooltip>
-</Box>
-
-
-
-<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-  <Typography variant="body2">Status</Typography>
-
-  <Tooltip title="Select the voucher status to filter records.">
-    <InfoOutlinedIcon
-      fontSize="small"
-      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
-    />
-  </Tooltip>
-</Box>
-
-<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-  <Typography variant="body2">Category</Typography>
-
-  <Tooltip title="Select a voucher category or leave blank to view all categories.">
-    <InfoOutlinedIcon
-      fontSize="small"
-      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
-    />
-  </Tooltip>
-</Box>
+<FormHelperText>
+Select a voucher category or leave blank to search all categories.
+</FormHelperText>
