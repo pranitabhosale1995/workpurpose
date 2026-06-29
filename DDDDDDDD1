@@ -1,43 +1,10 @@
-<FormControl
-  fullWidth
-  size="small"
-  error={!!errors.assetClassification}
->
-  <InputLabel>Classification *</InputLabel>
-
-  <Select
-    value={assetClassification}
-    label="Classification *"
-    onChange={(e) => {
-      setAssetClassification(e.target.value);
-      setErrors((prev) => ({
-        ...prev,
-        assetClassification: "",
-      }));
-    }}
-  >
-    {assetClassificationOptions.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </Select>
-
-  <FormHelperText>
-    {errors.assetClassification ||
-      "Select the asset classification to filter the records."}
-  </FormHelperText>
-</FormControl>
-
-import FormHelperText from "@mui/material/FormHelperText";
-
 <DatePicker
   label="From Date *"
   value={fromDate}
   minDate={dayjs("2026-04-01")}
   maxDate={dayjs()}
-  format="DD-MM-YYYY"
   disableFuture
+  format="DD-MM-YYYY"
   onChange={(value) => {
     setFromDate(value);
     setErrors((prev) => ({
@@ -46,19 +13,22 @@ import FormHelperText from "@mui/material/FormHelperText";
     }));
   }}
   slotProps={{
+    field: {
+      readOnly: true,
+    },
     textField: {
       fullWidth: true,
       size: "small",
       error: !!errors.fromDate,
       helperText:
-        errors.fromDate ||
-        "Select From Date (01-04-2026 onwards).",
-      inputProps: {
-        readOnly: true,
-      },
+        errors.fromDate || "Select From Date",
+      onKeyDown: (e) => e.preventDefault(),
+      onPaste: (e) => e.preventDefault(),
     },
   }}
 />
+
+
 
 <DatePicker
   label="To Date *"
@@ -75,127 +45,17 @@ import FormHelperText from "@mui/material/FormHelperText";
     }));
   }}
   slotProps={{
+    field: {
+      readOnly: true,
+    },
     textField: {
       fullWidth: true,
       size: "small",
       error: !!errors.toDate,
       helperText:
-        errors.toDate ||
-        "Select To Date (01-04-2026 onwards).",
-      inputProps: {
-        readOnly: true,
-      },
+        errors.toDate || "Select To Date",
+      onKeyDown: (e) => e.preventDefault(),
+      onPaste: (e) => e.preventDefault(),
     },
   }}
 />
-
-const validate = () => {
-  const temp = {};
-
-  if (!assetClassification) {
-    temp.assetClassification =
-      "Classification is required";
-  }
-
-  if (!fromDate) {
-    temp.fromDate = "From Date is required";
-  }
-
-  if (!toDate) {
-    temp.toDate = "To Date is required";
-  }
-
-  if (
-    fromDate &&
-    dayjs(fromDate).isBefore(dayjs("2026-04-01"), "day")
-  ) {
-    temp.fromDate =
-      "Date should be on or after 01-04-2026";
-  }
-
-  if (
-    toDate &&
-    dayjs(toDate).isBefore(dayjs("2026-04-01"), "day")
-  ) {
-    temp.toDate =
-      "Date should be on or after 01-04-2026";
-  }
-
-  if (
-    fromDate &&
-    dayjs(fromDate).isAfter(dayjs(), "day")
-  ) {
-    temp.fromDate = "Future date is not allowed";
-  }
-
-  if (
-    toDate &&
-    dayjs(toDate).isAfter(dayjs(), "day")
-  ) {
-    temp.toDate = "Future date is not allowed";
-  }
-
-  if (
-    fromDate &&
-    toDate &&
-    dayjs(fromDate).isAfter(dayjs(toDate), "day")
-  ) {
-    temp.toDate =
-      "To Date should be greater than or equal to From Date";
-  }
-
-  setErrors(temp);
-
-  return Object.keys(temp).length === 0;
-};
-
-setErrors({});
-
-
-
-<Box
-  sx={{
-    display: "flex",
-    gap: 1,
-    alignItems: "flex-start",
-    pt: "4px",
-  }}
->
-  <Button
-    variant="contained"
-    onClick={() =>
-      handleSearch(
-        paginationModel.page,
-        paginationModel.pageSize
-      )
-    }
-    sx={{
-      minWidth: 90,
-      height: 40,
-    }}
-  >
-    Search
-  </Button>
-
-  <Button
-    variant="outlined"
-    onClick={handleReset}
-    sx={{
-      minWidth: 90,
-      height: 40,
-    }}
-  >
-    Reset
-  </Button>
-</Box>
-
-
-<Box
-  sx={{
-    display: "grid",
-    gridTemplateColumns: "1.2fr 1fr 1fr auto",
-    gap: 2,
-    alignItems: "start",
-    mb: 2,
-  }}
->
