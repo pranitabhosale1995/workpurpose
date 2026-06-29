@@ -1,66 +1,73 @@
-const fetchVouchers = async () => {
+import Tooltip from "@mui/material/Tooltip";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-  // Search button click झाल्यावरच column change होईल
-  setSearchedStatus(searchStatus || "ACTIVE");
 
-  setLoading(true);
+<Box>
+  <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+    <Typography variant="body2">VID</Typography>
 
-  try {
-    let url = "/VE/voucher-transactions/search-vid";
-    const queryParams = [];
+    <Tooltip title="Enter the Voucher ID (e.g. VID12345). Leave blank to search all active vouchers.">
+      <InfoOutlinedIcon
+        fontSize="small"
+        sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
+      />
+    </Tooltip>
+  </Box>
 
-    // Default table load
-    if (
-      !searchVID &&
-      !searchStatus &&
-      !searchDate &&
-      !searchCategory
-    ) {
-      queryParams.push("status=ACTIVE");
-    }
+  <TextField
+    fullWidth
+    size="small"
+    placeholder="Enter VID"
+    value={searchVID}
+    error={Boolean(vidError)}
+    helperText={vidError || " "}
+    onChange={handleVIDChange}
+  />
+</Box>
 
-    if (searchVID) {
-      queryParams.push(`vid=${searchVID}`);
-    }
 
-    if (searchStatus) {
-      queryParams.push(`status=${searchStatus}`);
-    }
+<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+  <Typography variant="body2">Date</Typography>
 
-    if (searchDate) {
-      queryParams.push(
-        `date=${dayjs(searchDate).format("YYYY-MM-DD")}`
-      );
-    }
+  <Tooltip title="Select the voucher creation date. Future dates are not allowed.">
+    <InfoOutlinedIcon
+      fontSize="small"
+      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
+    />
+  </Tooltip>
+</Box>
 
-    if (searchCategory) {
-      queryParams.push(`categoryId=${searchCategory}`);
-    }
+<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+  <Typography variant="body2">Status</Typography>
 
-    if (queryParams.length > 0) {
-      url += "?" + queryParams.join("&");
-    }
+  <Tooltip title="Select the voucher status to filter records.">
+    <InfoOutlinedIcon
+      fontSize="small"
+      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
+    />
+  </Tooltip>
+</Box>
 
-    console.log("Table URL =>", url);
 
-    const response = await callApi(url, null, "GET");
 
-    const data = Array.isArray(response)
-      ? response
-      : response?.data || [];
+<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+  <Typography variant="body2">Status</Typography>
 
-    setRows(data);
+  <Tooltip title="Select the voucher status to filter records.">
+    <InfoOutlinedIcon
+      fontSize="small"
+      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
+    />
+  </Tooltip>
+</Box>
 
-  } catch (error) {
-    console.error("Fetch Error =>", error);
+<Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+  <Typography variant="body2">Category</Typography>
 
-    setSnackbar({
-      open: true,
-      message: "Failed to fetch vouchers",
-      severity: "error",
-    });
-
-  } finally {
-    setLoading(false);
-  }
-};
+  <Tooltip title="Select a voucher category or leave blank to view all categories.">
+    <InfoOutlinedIcon
+      fontSize="small"
+      sx={{ ml: 0.5, color: "primary.main", cursor: "pointer" }}
+    />
+  </Tooltip>
+</Box>
