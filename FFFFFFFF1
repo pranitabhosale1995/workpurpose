@@ -54,3 +54,35 @@
   fullWidth
 />
 
+
+
+<DatePicker
+  label="Date"
+  value={transactionDate}
+  minDate={dayjs("2026-04-01")}
+  maxDate={dayjs()}
+  disableFuture
+  format="DD-MM-YYYY"
+  onChange={(value) => {
+    settransactionDate(value);
+    setErrors((prev) => ({
+      ...prev,
+      transactionDate: "",
+    }));
+  }}
+  slotProps={{
+    field: {
+      readOnly: true,
+    },
+    textField: {
+      fullWidth: true,
+      size: "small",
+      error: !!errors.transactionDate,
+      helperText:
+        errors.transactionDate ||
+        "Select Transaction Date (Optional).",
+      onKeyDown: (e) => e.preventDefault(),
+      onPaste: (e) => e.preventDefault(),
+    },
+  }}
+/>
