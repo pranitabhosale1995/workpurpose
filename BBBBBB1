@@ -19,3 +19,23 @@ Select the voucher status to filter the records.
 <FormHelperText>
 Select a voucher category or leave blank to search all categories.
 </FormHelperText>
+
+
+
+<DatePicker
+  disableFuture
+  label="Date"
+  value={searchDate}
+  minDate={dayjs("2026-04-01")}
+  onChange={(newValue) =>
+    setSearchDate(newValue)
+  }
+  slotProps={{
+    textField: {
+      size: "small",
+      fullWidth: true,
+      helperText:
+        "Select a date from 01-Apr-2026 to today.",
+    },
+  }}
+/>
