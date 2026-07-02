@@ -1,4 +1,15 @@
+const [isSearched, setIsSearched] = useState(false);
+setShowTable(true);
+setIsSearched(true);
+
+setIsSearched(false);
+
 const handleExportButton = async () => {
+  if (!isSearched) {
+    alert("Please search records first.");
+    return;
+  }
+
   try {
     const payload = {
       cgl,
@@ -14,10 +25,10 @@ const handleExportButton = async () => {
       "/VE/voucher-transactions/export",
       payload,
       "POST",
-      "blob",   // responseType
+      "blob",
       "application/json",
-      {},       // extraConfig
-      false     // return full response
+      {},
+      false
     );
 
     const blob = new Blob([response.data], {
@@ -29,6 +40,7 @@ const handleExportButton = async () => {
     const link = document.createElement("a");
     link.href = url;
     link.download = "Voucher_Report.xlsx";
+
     document.body.appendChild(link);
     link.click();
 
@@ -38,3 +50,17 @@ const handleExportButton = async () => {
     console.error("Export Error =>", err);
   }
 };
+
+
+<Button
+  variant="contained"
+  color="success"
+  onClick={handleExportButton}
+  disabled={!isSearched || loading}
+  sx={{
+    minWidth: 120,
+    height: 45,
+  }}
+>
+  Export
+</Button>
