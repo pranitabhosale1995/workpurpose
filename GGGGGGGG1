@@ -60,3 +60,43 @@ const fetchVouchers = async () => {
     setLoading(false);
   }
 };
+
+
+const handleReset = async () => {
+  setSearchVID("");
+  setSearchStatus("");
+  setSearchCategory("");
+  setSearchDate(null);
+  setSearchedStatus("ACTIVE");
+  setVidError("");
+
+  setLoading(true);
+
+  try {
+    const response = await callApi(
+      "/VE/voucher-transactions/search-vid",
+      {
+        status: "ACTIVE",
+      },
+      "POST"
+    );
+
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
+
+    setRows(data);
+
+  } catch (error) {
+    console.error("Reset Error =>", error);
+
+    setSnackbar({
+      open: true,
+      message: "Failed to fetch vouchers",
+      severity: "error",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
