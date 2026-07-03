@@ -70,3 +70,53 @@ const handleExport = async () => {
     setLoading(false);
   }
 };
+
+
+const payload = {};
+
+if (
+  !searchVID &&
+  !searchStatus &&
+  !searchDate &&
+  !searchCategory
+) {
+  payload.status = "ACTIVE";
+}
+
+if (searchVID) {
+  payload.vid = searchVID;
+}
+
+if (searchStatus) {
+  payload.status = searchStatus;
+}
+
+if (searchDate) {
+  payload.date = dayjs(searchDate).format("YYYY-MM-DD");
+}
+
+if (searchCategory) {
+  payload.categoryId = searchCategory;
+}
+
+console.log("Search Payload =>", payload);
+
+const response = await callApi(
+  "/VE/voucher-transactions/search-vid",
+  payload,
+  "POST"
+);
+
+const data = Array.isArray(response)
+  ? response
+  : response?.data || [];
+
+setRows(data);
+
+
+
+const response = await callApi(
+  "/VE/voucher-transactions/search-vid",
+  { status: "ACTIVE" },
+  "POST"
+);
