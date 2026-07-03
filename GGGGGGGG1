@@ -1,10 +1,11 @@
-const handleExport = async () => {
-  try {
-    setLoading(true);
+const fetchVouchers = async () => {
+  setSearchedStatus(searchStatus || "ACTIVE");
+  setLoading(true);
 
+  try {
     const payload = {};
 
-    // Default Active export
+    // Default Active records
     if (
       !searchVID &&
       !searchStatus &&
@@ -30,93 +31,32 @@ const handleExport = async () => {
       payload.categoryId = searchCategory;
     }
 
-    console.log("Export Payload =>", payload);
+    console.log("Search Payload =>", payload);
 
     const response = await callApi(
-      "/VE/voucher-transactions/search-vid/export",
+      "/VE/voucher-transactions/search-vid",
       payload,
-      "POST",
-      "blob",
-      "application/json",
-      {},
-      false
+      "POST"
     );
 
-    const blob = new Blob([response.data], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+    console.log("Search Response =>", response);
 
-    const url = window.URL.createObjectURL(blob);
+    const data = Array.isArray(response)
+      ? response
+      : response?.data || [];
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "VoucherRequests.xlsx";
-
-    document.body.appendChild(link);
-    link.click();
-
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    setRows(data);
 
   } catch (error) {
-    console.error("Export Error =>", error);
+    console.error("Fetch Error =>", error);
 
     setSnackbar({
       open: true,
-      message: "Export failed",
+      message: "Failed to fetch vouchers",
       severity: "error",
     });
+
   } finally {
     setLoading(false);
   }
 };
-
-
-const payload = {};
-
-if (
-  !searchVID &&
-  !searchStatus &&
-  !searchDate &&
-  !searchCategory
-) {
-  payload.status = "ACTIVE";
-}
-
-if (searchVID) {
-  payload.vid = searchVID;
-}
-
-if (searchStatus) {
-  payload.status = searchStatus;
-}
-
-if (searchDate) {
-  payload.date = dayjs(searchDate).format("YYYY-MM-DD");
-}
-
-if (searchCategory) {
-  payload.categoryId = searchCategory;
-}
-
-console.log("Search Payload =>", payload);
-
-const response = await callApi(
-  "/VE/voucher-transactions/search-vid",
-  payload,
-  "POST"
-);
-
-const data = Array.isArray(response)
-  ? response
-  : response?.data || [];
-
-setRows(data);
-
-
-
-const response = await callApi(
-  "/VE/voucher-transactions/search-vid",
-  { status: "ACTIVE" },
-  "POST"
-);
