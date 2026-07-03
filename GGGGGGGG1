@@ -26,3 +26,52 @@
     loading={loading}
   />
 </Box>
+
+
+
+const handleExport = async () => {
+  try {
+    setLoading(true);
+
+    const payload = {};
+
+    // Default ACTIVE export
+    if (
+      !searchVID &&
+      !searchStatus &&
+      !searchDate &&
+      !searchCategory
+    ) {
+      payload.status = "ACTIVE";
+    }
+
+    if (searchVID) {
+      payload.vid = searchVID;
+    }
+
+    if (searchStatus) {
+      payload.status = searchStatus;
+    }
+
+    if (searchDate) {
+      payload.date = dayjs(searchDate).format("YYYY-MM-DD");
+    }
+
+    if (searchCategory) {
+      payload.categoryId = searchCategory;
+    }
+
+    const response = await callApi(
+      "/VE/voucher-transactions/search-vid/export",
+      payload,
+      "POST"
+    );
+
+    console.log(response);
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
