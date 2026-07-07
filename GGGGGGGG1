@@ -1,108 +1,130 @@
- const handleChange = (e) => {
-    const { name, value } =
-      e.target;
+ <Autocomplete
+                multiple
+                disableCloseOnSelect
 
-    if (
-      name === "description" &&
-      value.length > 500
-    ) {
-      return;
-    }
+                open={issueOpen}
 
-    if (name === "otherCategory") {
-      const regex =
-        /^(?!.*\s{2,})[A-Za-z0-9 -]*$/;
+                onOpen={() => {
 
-      if (!regex.test(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          otherCategory: "Special Character and spaces not allowed",
-        }));
-        return;
-      }
+                  if (!formData.categoryId) {
 
-      if (value.length >= 21) {
-        setErrors((prev) => ({
-          ...prev,
-          otherCategory: "Maximum 20 characters allowed",
-        }));
-        return;
-      }
-
-
-    }
-
-
-    if (name === "sdRequestNumber") {
-      const regex =
-        /^[0-9,]*$/;
-
-      if (!regex.test(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          sdRequestNumber: "Character, Special Characters and space not allowed",
-        }));
-         setTimeout(()=>{
+                    setErrors((prev) => ({
+                      ...prev,
+                      issues:
+                        "Please select Voucher Category first",
+                    }));
+                     setTimeout(()=>{
           setErrors((prev)=>({
             ...prev,
-            sdRequestNumber:"",
+            issues:"",
 
           }))
         },1000)
-        return;
-      }
 
-      if (value.length >= 51) {
-        setErrors((prev) => ({
-          ...prev,
-          sdRequestNumber: "Maximum 50 number allowed",
-        }));
-        setTimeout(()=>{
-          setErrors((prev)=>({
-            ...prev,
-            sdRequestNumber:"",
+                    return;
+                  }
 
-          }))
-        },1000)
-        return;
-      }
+                  setErrors((prev) => ({
+                    ...prev,
+                    issues: "",
+                  }));
 
-    }
+                  setIssueOpen(true);
+                }}
+                onClose={() => setIssueOpen(false)}
 
-    if (name === "categoryId") {
+                options={[
+                  ...issueList,
 
-      const selectedCategory =
-        voucherCategories.find(
-          (item) => item.id == value
-        );
-      console.log(
-        "Selected Category =>",
-        selectedCategory
-      );
+                  ...(formData.categoryId
+                    ? [
+                      {
+                        id: "ADD_NEW",
+                        issueCategoryName:
+                          "+ Add Issue",
+                      },
+                    ]
+                    : []),
+                ]}
+                value={selectedIssues}
 
-      console.log(
-        "Issues =>",
-        selectedCategory?.issueCategories
-      );
-
-      setIssueList(
-        selectedCategory?.issueCategories || []
-      );
-
-      setSelectedIssues([]);
-      setCustomIssues([]);
-      setCustomIssueInput("");
-      setShowCustomIssue(false);
-    }
+                onChange={(
+                  event,
+                  newValue
+                ) => {
+                  const addIssueClicked =
+                    newValue.find(
+                      (item) =>
+                        item.id ===
+                        "ADD_NEW"
+                    );
 
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+                  if (addIssueClicked) {
+                    setShowCustomIssue(true);
+                    setIssueOpen(false);
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
-  };
+                    setSelectedIssues(
+                      newValue.filter(
+                        (item) => item.id !== "ADD_NEW"
+                      )
+                    );
+
+                    return;
+                  }
+                  setSelectedIssues(
+                    newValue
+                  );
+                }}
+                getOptionLabel={(
+                  option
+                ) =>
+                  option.issueCategoryName ||
+                  ""
+                }
+                renderOption={(
+                  props,
+                  option,
+                  { selected }
+                ) => (
+                  <li {...props}>
+                    {option.id !==
+                      "ADD_NEW" && (
+                        <Checkbox
+                          checked={
+                            selected
+                          }
+                          size="small"
+                        />
+                      )}
+
+                    {
+                      option.issueCategoryName
+                    }
+                  </li>
+                )}
+                slotProps={{
+                  listbox: {
+                    sx: {
+                      maxHeight: 300,
+                      overflowY: "auto"
+                    }
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search Issues*"
+                    placeholder="Search Issues"
+                    error={!!errors.issues}
+                    helperText={
+                      errors.issues
+                        ? errors.issues
+                        : "Select one or more issues. If not available, choose Add New Issues."
+                    }
+
+
+
+                  />
+                )}
+              />
