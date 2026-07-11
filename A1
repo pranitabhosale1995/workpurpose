@@ -62,3 +62,41 @@ onChange={(e) => {
   setDeleteRemark(value);
   setRemarkError("");
 }}
+
+
+const [remarkError, setRemarkError] = useState("");
+const [deleteRemark, setDeleteRemark] = useState("");
+const [remarkTouched, setRemarkTouched] = useState(false);
+
+
+onChange={(e) => {
+  const value = e.target.value;
+
+  setRemarkTouched(true);
+
+  if (/^\s/.test(value)) {
+    setRemarkError("Remark should not start with a space.");
+    return;
+  }
+
+  if (/\s{2,}/.test(value)) {
+    setRemarkError("Consecutive spaces are not allowed.");
+    return;
+  }
+
+  if (value.length > 200) {
+    setRemarkError("Maximum 200 characters allowed.");
+    return;
+  }
+
+  setDeleteRemark(value);
+  setRemarkError("");
+}}
+
+error={remarkTouched && Boolean(remarkError)}
+
+helperText={
+  remarkTouched && remarkError
+    ? remarkError
+    : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
+}
