@@ -1,34 +1,38 @@
-onChange={(e) => {
-  const value = e.target.value;
+<TextField
+  fullWidth
+  multiline
+  rows={5}
+  label="Remark *"
+  value={deleteRemark}
+  onChange={(e) => {
+    const value = e.target.value;
 
-  // First space not allowed
-  if (value.startsWith(" ")) {
-    setDeleteRemark(""); // state update
-    setRemarkError("Remark should not start with a space.");
-    return;
-  }
+    if (value.startsWith(" ")) {
+      setDeleteRemark(value);
+      setRemarkError("Remark should not start with a space.");
+      return;
+    }
 
-  // Consecutive spaces
-  if (value.includes("  ")) {
+    if (value.includes("  ")) {
+      setDeleteRemark(value);
+      setRemarkError("Consecutive spaces are not allowed.");
+      return;
+    }
+
+    if (value.length > 200) {
+      setDeleteRemark(value);
+      setRemarkError("Maximum 200 characters allowed.");
+      return;
+    }
+
     setDeleteRemark(value);
-    setRemarkError("Consecutive spaces are not allowed.");
-    return;
+    setRemarkError("");
+  }}
+  inputProps={{ maxLength: 200 }}
+  error={Boolean(remarkError)}
+  helperText={
+    remarkError
+      ? remarkError
+      : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
   }
-
-  // Max length
-  if (value.length > 200) {
-    setRemarkError("Maximum 200 characters allowed.");
-    return;
-  }
-
-  setDeleteRemark(value);
-  setRemarkError("");
-}}
-
-
-error={!!remarkError}
-helperText={
-  remarkError
-    ? `${remarkError} (${deleteRemark.length}/200)`
-    : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
-}
+/>
