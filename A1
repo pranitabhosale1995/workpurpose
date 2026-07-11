@@ -1119,3 +1119,42 @@ helperText={
 };
 
 export default ViewVoucherRequestsScreen;
+
+
+
+
+
+
+onChange={(e) => {
+  const value = e.target.value;
+
+  setRemarkTouched(true);
+
+  if (value.startsWith(" ")) {
+    setRemarkError("Remark should not start with a space.");
+    return;
+  }
+
+  if (value.includes("  ")) {
+    setRemarkError("Consecutive spaces are not allowed.");
+    return;
+  }
+
+  setDeleteRemark(value);
+
+  if (value.length > 200) {
+    setRemarkError("Maximum 200 characters allowed.");
+  } else {
+    setRemarkError("");
+  }
+}}
+
+
+error={Boolean(remarkError)}
+helperText={
+  remarkError
+    ? remarkError
+    : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
+}
+
+
