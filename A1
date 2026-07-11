@@ -1,153 +1,26 @@
-if (showCustomIssue) {
-  const issue =
-    customIssueInput.trim();
-
-  if (!issue) {
-    newErrors.customIssue =
-      "Please enter issue";
-  } else if (issue.length > 50) {
-    newErrors.customIssue =
-      "Maximum 50 characters allowed";
-  }
-}
-
-
-
 onChange={(e) => {
   const value = e.target.value;
 
-  if (!/^[A-Za-z0-9 ]*$/.test(value)) {
-    setErrors((prev) => ({
-      ...prev,
-      customIssue:
-        "Special characters are not allowed",
-    }));
+  // First character space
+  if (value.length > 0 && value[0] === " ") {
+    setDeleteRemark(value);
+    setRemarkError("Description should not start with a space.");
     return;
   }
 
-  setCustomIssueInput(value);
-
-  setErrors((prev) => ({
-    ...prev,
-    customIssue: "",
-  }));
-}}
-
-inputProps={{
-  maxLength: 50,
-}}
-
-
-if (
-  selectedIssues.length === 0 &&
-  customIssues.length === 0
-) {
-  if (showCustomIssue) {
-    newErrors.customIssue =
-      "Please add the issue first";
-  } else {
-    newErrors.issues =
-      "Please select at least one issue";
+  // Consecutive spaces
+  if (value.includes("  ")) {
+    setDeleteRemark(value);
+    setRemarkError("Consecutive spaces are not allowed.");
+    return;
   }
-}
 
-
-
-if (
-  showCustomIssue &&
-  customIssueInput.trim() &&
-  customIssues.length === 0
-) {
-  newErrors.customIssue =
-    "Please add this issue first";
-}
-
-
-
-<Button
-  size="small"
-  variant="contained"
-  startIcon={<AddIcon />}
-  onClick={() => {
-    const issue =
-      customIssueInput.trim();
-
-    if (!issue) {
-      setErrors((prev) => ({
-        ...prev,
-        customIssue:
-          "Please enter issue",
-      }));
-      return;
-    }
-
-    setCustomIssues((prev) => [
-      ...prev,
-      issue,
-    ]);
-
-    setErrors((prev) => ({
-      ...prev,
-      issues: "",
-      customIssue: "",
-    }));
-
-    setCustomIssueInput("");
-  }}
->
-  Add
-</Button>
-
-if (
-  selectedIssues.length === 0 &&
-  customIssues.length === 0
-) {
-  newErrors.issues =
-    "Please select at least one issue";
-}
-
-if (
-  showCustomIssue &&
-  customIssueInput.trim() &&
-  customIssues.length === 0
-) {
-  newErrors.customIssue =
-    "Please add this issue first";
-}
-
-
-<TextField
-  fullWidth
-  label="Enter New Issue"
-  value={customIssueInput}
-  error={!!errors.customIssue}
-  helperText={
-    errors.customIssue
-      ? errors.customIssue
-      : `${customIssueInput.length}/50`
+  // Max length
+  if (value.length > 200) {
+    setRemarkError("Maximum 200 characters allowed.");
+    return;
   }
-  inputProps={{
-    maxLength: 50,
-  }}
-  onChange={(e) => {
-    const value = e.target.value;
 
-    if (!/^[A-Za-z0-9 ]*$/.test(value)) {
-      setErrors((prev) => ({
-        ...prev,
-        customIssue:
-          "Special characters are not allowed",
-      }));
-      return;
-    }
-
-    setCustomIssueInput(value);
-
-    setErrors((prev) => ({
-      ...prev,
-      customIssue: "",
-    }));
-  }}
-/>
-
-
+  setDeleteRemark(value);
+  setRemarkError("");
+}}
