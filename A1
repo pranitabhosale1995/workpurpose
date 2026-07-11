@@ -36,3 +36,29 @@
       : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
   }
 />
+
+
+
+onChange={(e) => {
+  const value = e.target.value;
+
+  // First character should not be space
+  if (/^\s/.test(value)) {
+    setRemarkError("Remark should not start with a space.");
+    return; // state update करू नको
+  }
+
+  // Consecutive spaces
+  if (/\s{2,}/.test(value)) {
+    setRemarkError("Consecutive spaces are not allowed.");
+    return;
+  }
+
+  if (value.length > 200) {
+    setRemarkError("Maximum 200 characters allowed.");
+    return;
+  }
+
+  setDeleteRemark(value);
+  setRemarkError("");
+}}
