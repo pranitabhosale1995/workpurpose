@@ -1,10 +1,10 @@
 onChange={(e) => {
   const value = e.target.value;
 
-  // First character space
-  if (value.length > 0 && value[0] === " ") {
-    setDeleteRemark(value);
-    setRemarkError("Description should not start with a space.");
+  // First space not allowed
+  if (value.startsWith(" ")) {
+    setDeleteRemark(""); // state update
+    setRemarkError("Remark should not start with a space.");
     return;
   }
 
@@ -24,3 +24,11 @@ onChange={(e) => {
   setDeleteRemark(value);
   setRemarkError("");
 }}
+
+
+error={!!remarkError}
+helperText={
+  remarkError
+    ? `${remarkError} (${deleteRemark.length}/200)`
+    : `All characters, numbers and special characters are allowed. (${deleteRemark.length}/200)`
+}
